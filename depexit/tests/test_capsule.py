@@ -44,6 +44,24 @@ def test_summary_has_evidence_hashes(tmp_path):
     assert len(summary["evidence"]["Jinja2/patch.diff"]) == 64     # sha256 hex digest
 
 
+def test_report_embeds_data_and_works_offline(tmp_path):
+    paths = write_sample(tmp_path)
+    page = Path(paths["report"]).read_text(encoding="utf-8")
+    assert "__DEPEXIT_DATA__" not in page          # data was injected
+    assert "Jinja2" in page
+    assert "http://" not in page.replace("http://www.w3.org", "") and "src=\"http" not in page   # no CDN
+
+
+def test_ai_text_cannot_break_out_of_report(tmp_path):
+    # Gemma's output is untrusted: a "</script>" inside it must not end our <script> block
+    evil = "</script><img src=x onerror=alert(1)>"
+    record = {"name": "evil", "status": "declared", "specs": {}, "usages": [], "signals": [], "health_score": 10}
+    result = {"dep": record, "ai": {"ok": True, "risk_explanation": evil}, "patch": evil, "run": None, "comparison": None}
+    paths = capsule.write_all(tmp_path, {"target": "x"}, [record], [result], None, {"total": 0, "correct": 0, "wrong": []})
+    page = Path(paths["report"]).read_text(encoding="utf-8")
+    assert page.count("</script>") == capsule.REPORT_TEMPLATE.read_text(encoding="utf-8").count("</script>")
+
+
 def test_handles_no_ai_and_no_tests(tmp_path):
     record = {"name": "six", "status": "unused", "specs": {"requirements.txt": ""},
               "usages": [], "signals": [], "health_score": 90, "at_risk": False}
