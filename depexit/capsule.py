@@ -13,7 +13,8 @@ import re
 import sys
 from pathlib import Path
 
-SAMPLE_BANNER = "> ⚠ **SAMPLE DATA, NOT A REAL RUN.** Every AI field and candidate test run in this file is invented.\n\n"
+REPORT_TEMPLATE = Path(__file__).parent / "templates" / "report.html"
+SAMPLE_BANNER ="> ⚠ **SAMPLE DATA, NOT A REAL RUN.** Every AI field and candidate test run in this file is invented.\n\n"
 
 
 def write_all(out, meta, records, results, baseline, card):
@@ -34,6 +35,9 @@ def write_all(out, meta, records, results, baseline, card):
     summary = {"meta": meta, "scorecard": card, "baseline": baseline, "records": records,
                "results": results, "evidence": evidence_hashes(out, baseline, results)}
     paths["summary"] = write_json(out / "summary.json", summary)
+    concern_map = {r["dep"]["name"]: concerns(full.get(r["dep"]["name"], r["dep"]), r.get("ai"), r.get("run"), r.get("comparison"))
+                   for r in results}
+    paths["report"] = write_report(out, {**summary, "concerns": concern_map})
     return {k: str(v) for k, v in paths.items()}
 
 
@@ -175,6 +179,18 @@ def concerns(dep, ai, run, cmp):
         out.append("Only requirements.txt was changed; pyproject.toml still has the old spec.")
     out.append("A passing test suite only proves the code paths the tests actually exercise.")
     return out
+
+
+# ---------- report.html ----------
+
+def write_report(out, data):
+    """Embed all data as JSON inside the self-contained template (no server or internet needed)."""
+    # "<" is escaped as < so text from Gemma like "</script>" can't end our <script> block early
+    blob = json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")
+    page = REPORT_TEMPLATE.read_text(encoding="utf-8").replace("__DEPEXIT_DATA__", blob)
+    path = out / "report.html"
+    path.write_text(page, encoding="utf-8")
+    return path
 
 
 # ---------- replay.ps1 ----------
