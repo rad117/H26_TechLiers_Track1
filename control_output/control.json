@@ -1,0 +1,98 @@
+{
+  "control": {
+    "source": "human-control",
+    "model": "none (human-written, deliberately wrong)",
+    "ok": true,
+    "risk_explanation": "toml is unmaintained; Python 3.11+ ships tomllib.",
+    "replacement": "tomllib (stdlib)",
+    "migration_type": "remove",
+    "requirement_changes": [
+      {
+        "action": "remove",
+        "name": "toml"
+      }
+    ],
+    "file_edits": [
+      {
+        "path": "linkwatch/config.py",
+        "new_content": "from typing import List\n\nimport tomllib\nfrom pydantic import BaseModel, validator\n\n\nclass Site(BaseModel):\n    name: str\n    url: str\n\n    class Config:\n        anystr_strip_whitespace = True\n\n    @validator(\"name\")\n    def name_not_empty(cls, value):\n        if not value:\n            raise ValueError(\"site name can not be empty\")\n        return value\n\n    @validator(\"url\")\n    def url_has_scheme(cls, value):\n        if not value.startswith((\"http://\", \"https://\")):\n            raise ValueError(\"url must start with http:// or https://\")\n        return value\n\n\nclass Settings(BaseModel):\n    title: str = \"linkwatch\"\n    output: str = \"status.html\"\n    sites: List[Site] = []\n\n    class Config:\n        extra = \"forbid\"\n\n\ndef load_settings(path=\"sites.toml\"):\n    with open(path) as fh:  # THE DELIBERATE BUG: tomllib needs open(path, \"rb\")\n        data = tomllib.load(fh)\n    return Settings(**data)\n"
+      }
+    ],
+    "steps": [
+      "Remove toml from requirements.txt",
+      "Load sites.toml with tomllib instead of toml"
+    ],
+    "suggested_tests": [],
+    "predicted_outcome": "pass",
+    "confidence": 0.9
+  },
+  "baseline": {
+    "label": "baseline",
+    "stage": "tests",
+    "ok": false,
+    "python_version": "3.12.13",
+    "venv_python": "C:\\Users\\radhe\\LinkWatch\\control_output\\_work\\target\\.venv\\Scripts\\python.exe",
+    "tests": 10,
+    "passed": 9,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 0,
+    "failing_tests": {
+      "tests/test_report.py::test_report_renders_all_sites": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (.venv\\Lib\\site-packages\\markupsafe\\__init__.py)"
+    },
+    "warnings": [
+      "linkwatch\\resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html"
+    ],
+    "duration_s": 21.4,
+    "commands": [
+      "uv venv --clear --python 3.12 .venv",
+      "uv pip install --python .venv\\Scripts\\python.exe -r requirements.txt pytest",
+      ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+    ],
+    "log_file": "C:\\Users\\radhe\\LinkWatch\\control_output\\_work\\logs\\baseline.log"
+  },
+  "run": {
+    "label": "toml-control",
+    "stage": "tests",
+    "ok": false,
+    "python_version": "3.12.13",
+    "venv_python": "C:\\Users\\radhe\\LinkWatch\\control_output\\_work\\candidates\\toml-control\\.venv\\Scripts\\python.exe",
+    "tests": 10,
+    "passed": 8,
+    "failed": 2,
+    "errors": 0,
+    "skipped": 0,
+    "failing_tests": {
+      "tests/test_config.py::test_sites_file_loads": "TypeError: File must be opened in binary mode, e.g. use `open('foo.toml', 'rb')`",
+      "tests/test_report.py::test_report_renders_all_sites": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (.venv\\Lib\\site-packages\\markupsafe\\__init__.py)"
+    },
+    "warnings": [
+      "linkwatch\\resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html"
+    ],
+    "duration_s": 13.8,
+    "commands": [
+      "uv venv --clear --python 3.12 .venv",
+      "uv pip install --python .venv\\Scripts\\python.exe -r requirements.txt pytest",
+      ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+    ],
+    "log_file": "C:\\Users\\radhe\\LinkWatch\\control_output\\_work\\logs\\toml-control.log"
+  },
+  "comparison": {
+    "verdict": "regressed",
+    "actual_outcome": "fail",
+    "predicted_outcome": "pass",
+    "prediction_correct": false,
+    "newly_failing": [
+      "tests/test_config.py::test_sites_file_loads"
+    ],
+    "newly_passing": [],
+    "still_failing": [
+      "tests/test_report.py::test_report_renders_all_sites"
+    ],
+    "new_warnings": [],
+    "gone_warnings": [],
+    "gaps": [
+      "tests/test_config.py::test_sites_file_loads now fails: TypeError: File must be opened in binary mode, e.g. use `open('foo.toml', 'rb')`"
+    ]
+  }
+}

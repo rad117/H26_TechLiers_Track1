@@ -14,3 +14,6 @@ capsule_dev/
 work/
 .env
 junit.xml
+
+# negative control: keep the evidence, not the venvs/clones
+control_output/_work/

@@ -1,0 +1,133 @@
+$ uv venv --clear --python 3.12 .venv
+Using CPython 3.12.13
+Creating virtual environment at: .venv
+Activate with: .venv\Scripts\activate
+
+$ uv pip install --python .venv\Scripts\python.exe -r requirements.txt pytest
+Resolved 24 packages in 17ms
+Installed 24 packages in 1.04s
+ + appdirs==1.4.4
+ + certifi==2026.7.22
+ + chardet==5.2.0
+ + charset-normalizer==3.5.2
+ + click==8.5.0
+ + colorama==0.4.6
+ + idna==2.7
+ + iniconfig==2.3.1
+ + jinja2==2.11.3
+ + markdown-it-py==4.2.0
+ + markupsafe==3.0.4
+ + mdurl==0.1.2
+ + packaging==26.3
+ + pluggy==1.7.0
+ + pydantic==1.10.13
+ + pygments==2.21.0
+ + pytest==9.1.1
+ + python-dateutil==2.9.0.post0
+ + requests==2.31.0
+ + rich==15.0.0
+ + setuptools==75.8.0
+ + six==1.17.0
+ + typing-extensions==4.16.0
+ + urllib3==2.8.0
+
+$ .venv\Scripts\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml
+........FF                                                               [100%]
+================================== FAILURES ===================================
+____________________________ test_sites_file_loads ____________________________
+
+    def test_sites_file_loads():
+>       settings = load_settings(SITES_FILE)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_config.py:9: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+linkwatch\config.py:38: in load_settings
+    data = tomllib.load(fh)
+           ^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fp = <_io.TextIOWrapper name='C:\\Users\\radhe\\LinkWatch\\control_output\\_work\\candidates\\toml-control\\tests\\..\\sites.toml' mode='r' encoding='cp1252'>
+parse_float = <class 'float'>
+
+    def load(fp: BinaryIO, /, *, parse_float: ParseFloat = float) -> dict[str, Any]:
+        """Parse TOML from a binary file object."""
+        b = fp.read()
+        try:
+            s = b.decode()
+        except AttributeError:
+>           raise TypeError(
+                "File must be opened in binary mode, e.g. use `open('foo.toml', 'rb')`"
+            ) from None
+E           TypeError: File must be opened in binary mode, e.g. use `open('foo.toml', 'rb')`
+
+C:\Users\radhe\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\tomllib\_parser.py:63: TypeError
+________________________ test_report_renders_all_sites ________________________
+
+tmp_path = WindowsPath('C:/Users/radhe/AppData/Local/Temp/pytest-of-radhe/pytest-116/test_report_renders_all_sites0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D4F3B6E8A0>
+
+    def test_report_renders_all_sites(tmp_path, monkeypatch):
+        monkeypatch.setenv("LINKWATCH_CACHE_DIR", str(tmp_path))
+        cache.save_results(RESULTS)
+        output = tmp_path / "status.html"
+>       result = CliRunner().invoke(cli, ["report", "-o", str(output)], catch_exceptions=False)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_report.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\click\testing.py:687: in invoke
+    return_value = cli.main(args=args or (), prog_name=prog_name, **extra)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\click\core.py:1552: in main
+    rv = self.invoke(ctx)
+         ^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\click\core.py:2032: in invoke
+    return _process_result(sub_ctx.command.invoke(sub_ctx))
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\click\core.py:1415: in invoke
+    return ctx.invoke(self.callback, **ctx.params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\click\core.py:910: in invoke
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+linkwatch\cli.py:56: in report
+    from .report import render_report
+linkwatch\report.py:3: in <module>
+    from jinja2 import Environment, FileSystemLoader, select_autoescape
+.venv\Lib\site-packages\jinja2\__init__.py:12: in <module>
+    from .environment import Environment
+.venv\Lib\site-packages\jinja2\environment.py:25: in <module>
+    from .defaults import BLOCK_END_STRING
+.venv\Lib\site-packages\jinja2\defaults.py:3: in <module>
+    from .filters import FILTERS as DEFAULT_FILTERS  # noqa: F401
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    # -*- coding: utf-8 -*-
+    """Built-in template filters used with the ``|`` operator."""
+    import math
+    import random
+    import re
+    import warnings
+    from collections import namedtuple
+    from itertools import chain
+    from itertools import groupby
+    
+    from markupsafe import escape
+    from markupsafe import Markup
+>   from markupsafe import soft_unicode
+E   ImportError: cannot import name 'soft_unicode' from 'markupsafe' (C:\Users\radhe\LinkWatch\control_output\_work\candidates\toml-control\.venv\Lib\site-packages\markupsafe\__init__.py)
+
+.venv\Lib\site-packages\jinja2\filters.py:13: ImportError
+============================== warnings summary ===============================
+linkwatch\resources.py:1
+  C:\Users\radhe\LinkWatch\control_output\_work\candidates\toml-control\linkwatch\resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+    import pkg_resources
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_config.py::test_sites_file_loads - TypeError: File must be ...
+FAILED tests/test_report.py::test_report_renders_all_sites - ImportError: can...
+2 failed, 8 passed, 1 warning in 9.40s
+
