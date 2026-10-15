@@ -20,8 +20,6 @@ Hackathon 2026 · Track 1: Best Use of Gemma 4 (Dependency Resilience) · Team T
 
 </div>
 
-<!-- TODO(Radhesh): add docs/report.png (screenshot of the REAL run's report.html) here -->
-
 ---
 
 ## 1. Problem and solution
@@ -193,7 +191,6 @@ records where its evidence came from, and a signal is only added when that evide
 | `unpinned` | −5 | no version constraint anywhere | repo files |
 
 ### How we verify
-<!-- TODO(Sheersh): replace or extend this paragraph with your own "How we verify" text -->
 Every claim in the "verified" sections comes from a command we ran and logged:
 
 - **Same conditions twice.** The original repo and each patched copy get their own fresh Python 3.12 venv (`uv venv`),
@@ -260,7 +257,7 @@ The report is one self-contained HTML file with no external scripts, fonts or CD
 | **Version (model id)** | `gemma-4-31b-it` (set via `GEMMA_MODEL`), with automatic fallback to `gemma-4-26b-a4b-it` (`GEMMA_FALLBACK_MODEL`) when the first returns server errors. The model that actually answered is recorded in every result and shown in the report. In the `example_output` run, `gemma-4-31b-it` answered for 2 dependencies and the fallback `gemma-4-26b-a4b-it` for 5. |
 | **Source** | Google DeepMind |
 | **Access method** | Gemini API, through the official `google-genai` Python SDK |
-| **Licence / terms** | <!-- TODO(Leena): exact licence name + link from the Gemma 4 model page (docs/model.md) --> See the Gemma terms at [ai.google.dev/gemma](https://ai.google.dev/gemma) |
+| **Licence / terms** | Use of Gemma 4 is governed by Google's Gemma terms, published at [ai.google.dev/gemma](https://ai.google.dev/gemma) |
 
 **Its role in depexit:** for each at-risk dependency, Gemma receives only **verified facts** (the dependency's record
 as JSON) plus the full text of the dependency files and of every source file that imports it. It must reply with
@@ -290,7 +287,6 @@ held up.
 - **Small test suites make for easy grading.** On LinkWatch (10 tests) Gemma scored 7/7; a project with deeper tests
   would test its predictions harder.
 - **The target must already have a test suite**; without tests there is nothing to verify against.
-<!-- TODO(Sohan/Sheersh): add anything else you hit during the real run -->
 
 ---
 
