@@ -8,7 +8,8 @@
      Visual rule: DASHED outline = Gemma's claim (not verified). SOLID fill = observed by depexit. -->
 <style>
   :root {
-    --paper: #F2F5F7; --surface: #FFFFFF; --ink: #16202A; --muted: #5A6875; --rule: #C9D3DC;
+    --paper: #F2F5F7; --surface: #FFFFFF; --ink: #16202A; --muted: #4A5866; --rule: #C9D3DC;
+    --hero-text: #EEF3F7; --hero-muted: #A8B6C3; --hero-verified: #34C79A; --hero-ai: #B9AEF5; --hero-bad: #F07A66;
     --verified: #0E7A5C; --verified-bg: #E3F2EC; --ai: #5B45C9; --ai-bg: #EFECFB;
     --bad: #C0392B; --warn: #B9770E; --good: #1E8449;
     --display: Bahnschrift, "DIN Alternate", "Segoe UI", system-ui, sans-serif;
@@ -16,7 +17,7 @@
     --code: "Cascadia Mono", Consolas, ui-monospace, monospace;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.5 var(--body); }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.55 var(--body); }
   button { font: inherit; color: inherit; }
   :focus-visible { outline: 3px solid var(--ai); outline-offset: 2px; }
   code, pre { font-family: var(--code); font-size: 13px; }
@@ -27,6 +28,57 @@
   .topbar a { color: #fff; }
   .topbar .model { margin-left: auto; color: #B9AEF5; }
   .sample { background: var(--bad); color: #fff; padding: .6rem clamp(1rem, 4vw, 3rem); font-weight: 600; }
+
+  /* ----- result band: the one bold moment on the page ----- */
+  .hero { background-color: var(--ink); color: var(--hero-text);
+          background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+                            linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+          background-size: 28px 28px; padding: 2.4rem clamp(1rem, 4vw, 3rem) 2rem; }
+  .hero-inner { max-width: 1120px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; gap: 2.4rem; }
+  .ring-wrap { position: relative; width: clamp(180px, 22vw, 240px); aspect-ratio: 1; flex: none; }
+  .ring-wrap::before { content: ""; position: absolute; inset: -22%; border-radius: 50%;
+                       background: radial-gradient(circle, rgba(52,199,154,.20), transparent 62%); }
+  #ring { position: relative; width: 100%; height: 100%; transform: rotate(-90deg); }
+  #ring .right { filter: drop-shadow(0 0 5px rgba(52,199,154,.55)); }
+  #ring .wrong { filter: drop-shadow(0 0 5px rgba(240,122,102,.55)); }
+  #ring .track { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 10; }
+  #ring .seg { fill: none; stroke-width: 10; transition: stroke-dasharray .7s cubic-bezier(.2,.7,.2,1); }
+  #ring .right { stroke: var(--hero-verified); } #ring .wrong { stroke: var(--hero-bad); } #ring .na { stroke: #5D6B78; }
+  @media (prefers-reduced-motion: reduce) { #ring .seg { transition: none; } }
+  .ring-label { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+  .ring-label span { font: 700 clamp(2.6rem, 5vw, 3.6rem)/1 var(--display); letter-spacing: -.01em; }
+  .ring-label small { color: var(--hero-muted); font-size: .85rem; line-height: 1.25; margin-top: .3rem; }
+  .hero-text { flex: 1 1 26rem; }
+  .hero h1 { color: #fff; margin: 0 0 .7rem; max-width: 20ch; }
+  .hero-lede { color: var(--hero-muted); max-width: 62ch; margin: 0 0 1.4rem; }
+  .stats { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .6rem 2.2rem; }
+  .stats li { display: flex; align-items: baseline; gap: .5rem; }
+  .stats b { font: 700 2rem/1 var(--display); color: #fff; }
+  .stats b.good { color: var(--hero-verified); }
+  .stats span { color: var(--hero-muted); }
+  .pipeline { list-style: none; counter-reset: step; max-width: 1120px; margin: 2.2rem auto 0; padding: 0;
+              display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: .8rem; }
+  .pipeline li { counter-increment: step; border: 2px solid var(--hero-verified); border-radius: 6px; padding: .7rem .9rem; position: relative; }
+  .pipeline li.ai { border-style: dashed; border-color: var(--hero-ai); }
+  .pipeline li::before { content: counter(step); position: absolute; top: .55rem; right: .7rem;
+                         font: 600 .8rem var(--display); color: var(--hero-muted); }
+  @media (min-width: 900px) {   /* connectors between steps, only when they sit on one row */
+    .pipeline { grid-template-columns: repeat(5, 1fr); gap: 1.4rem; }
+    .pipeline li:not(:last-child)::after { content: ""; position: absolute; top: 50%; right: calc(-1.4rem - 2px);
+      width: 1.4rem; height: 2px; background: var(--hero-muted); opacity: .45; }
+  }
+  .pipeline li { background: rgba(255,255,255,.03); }
+  .pipeline b { display: block; font: 700 1.7rem/1.1 var(--display); color: #fff; }
+  .pipeline li.ai b { color: var(--hero-ai); }
+  .pipeline span { color: var(--hero-muted); font-size: .9rem; }
+
+  /* ----- featured migration: the Before/After switch, on the page instead of hidden in the drawer ----- */
+  .spotlight { margin-top: 2.4rem; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px;
+               padding: 1.4rem clamp(1rem, 3vw, 2rem) 1.6rem; }
+  .spotlight h2 { margin-top: 0; }
+  .spotlight .ba { margin-top: .4rem; }
+  .spot-open { margin-top: 1rem; background: var(--ink); color: #fff; border: 0; border-radius: 6px;
+               padding: .55rem 1.1rem; cursor: pointer; font: 600 .95rem var(--display); }
 
   main { max-width: 1120px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem) 4rem; }
   h1 { font: 600 clamp(2rem, 5vw, 3.4rem)/1.08 var(--display); margin: 2.4rem 0 .6rem; max-width: 26ch; text-wrap: balance; }
@@ -67,11 +119,12 @@
   .gridwrap { padding: .4rem; }
   table.grid { border-collapse: separate; border-spacing: 5px; min-width: 0; width: auto; }
   .grid th { border: 0; padding: .3rem .4rem; vertical-align: bottom; }
-  .grid th.test { font: 13px var(--code); color: var(--ink); text-align: right; padding-right: .8rem; white-space: nowrap; }
+  .grid th.test { font: 13px var(--code); color: var(--ink); text-align: right; padding-right: .8rem;
+                  max-width: 18rem; overflow-wrap: anywhere; }
   .grid th button { background: none; border: 0; padding: 0; cursor: pointer; font: 600 .95rem var(--display);
                     text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 4px; }
-  .cell { min-width: 5.6rem; text-align: center; border-radius: 4px; padding: .45rem .6rem; border: 0;
-          font: 600 .9rem var(--display); color: #fff; }
+  .cell { min-width: 6.4rem; text-align: center; border-radius: 4px; padding: .6rem .8rem; border: 0;
+          font: 600 1rem var(--display); color: #fff; }
   .cell.pass { background: var(--good); } .cell.fail { background: var(--bad); }
   .cell.same { opacity: .35; }
   .cell.changed { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink); }
@@ -119,23 +172,37 @@
   .ba-head { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
   .ba-head h4 { margin: 0; font: 600 1.15rem var(--display); }
   .switch { display: inline-flex; margin-left: auto; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; }
-  .switch button { border: 0; background: none; padding: .3rem 1.1rem; cursor: pointer; font: 600 .95rem var(--display); }
+  .switch button { border: 0; background: none; padding: .45rem 1.5rem; cursor: pointer; font: 700 1.05rem var(--display); }
   .switch button[aria-pressed="true"] { background: var(--ink); color: #fff; }
   .ba h5 { font: 600 .9rem var(--body); color: var(--muted); margin: 1rem 0 .3rem; }
-  .ba-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: .8rem; align-items: center;
-            padding: .3rem .5rem; border-radius: 4px; }
-  .ba-row.delta { box-shadow: inset 3px 0 0 var(--ink); }
-  .ba-label { font: 13px var(--code); overflow-wrap: anywhere; }
-  .ba-val { font: 600 .95rem var(--display); white-space: nowrap; }
+  .ba-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(7.5rem, auto) minmax(7rem, auto); gap: 1rem;
+            align-items: center; padding: .45rem .7rem; border-left: 4px solid transparent; }
+  .ba-row.delta { border-left-color: var(--verified); background: #F1F8F5; }
+  .ba-label { font: 14px var(--code); overflow-wrap: anywhere; }
+  .ba-val { white-space: nowrap; justify-self: start; }
+  .ba-val > span { display: inline-block; padding: .2rem .75rem; border-radius: 999px; background: #E9EEF2;
+                   font: 700 1.15rem/1.2 var(--display); }
   .ba[data-state="before"] .v-after, .ba[data-state="after"] .v-before { display: none; }
-  .v-fail { color: var(--bad); } .v-pass { color: var(--good); } .v-none { color: var(--muted); font-weight: 400; }
+  .ba-val > .v-fail { background: var(--bad); color: #fff; }
+  .ba-val > .v-pass { background: var(--good); color: #fff; }
+  .ba-val > .v-none { background: none; color: var(--muted); font-weight: 400; font-size: 1rem; }
+  .ba-row > :last-child { justify-self: end; }
   /* motion only on rows whose value differs between Before and After */
   .flash { animation: flash .9s ease-out; }
   .flash .ba-val { animation: rise .3s ease-out; }
   @keyframes flash { from { background: #FFEDB8; } to { background: transparent; } }
   @keyframes rise { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
   @media (prefers-reduced-motion: reduce) { .flash, .flash .ba-val { animation: none; } }
-  .evbtn { background: none; border: 1px solid var(--ink); border-radius: 4px; padding: .1rem .5rem; cursor: pointer; font-size: 12px; }
+  .evbtn { background: var(--ink); color: #fff; border: 0; border-radius: 999px; padding: .35rem .95rem; cursor: pointer;
+           font: 600 .9rem var(--display); }
+  .evbtn:hover { background: var(--verified); }
+  .ev-cols > div { min-width: 0; }               /* long tracebacks scroll inside their column, not out of the card */
+  .ba-evidence h5 { font: 600 1.1rem var(--display); color: var(--ink); }
+  .ev-pkg { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin: .4rem 0 .8rem; }
+  .ev-pkg code { font-size: 1rem; }
+  .ev-pkg .old, .ev-pkg .new { font: 700 1.3rem var(--display); padding: .15rem .7rem; border-radius: 999px; }
+  .ev-pkg .old { background: #FBE3DF; color: var(--bad); text-decoration: line-through; }
+  .ev-pkg .new { background: #DDF2E8; color: var(--good); }
   .ba-evidence:not(:empty) { margin-top: 1rem; border-top: 2px solid var(--ink); padding-top: .4rem; }
   .ba-evidence:focus { outline: none; }
   .ev-cols { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
@@ -162,9 +229,29 @@
 </div>
 <div class="sample" id="sample" hidden>Sample data, not a real run. Every AI answer and candidate test run on this page is invented.</div>
 
+<header class="hero">
+  <div class="hero-inner">
+    <div class="ring-wrap">
+      <svg id="ring" viewBox="0 0 120 120" aria-hidden="true"></svg>
+      <div class="ring-label"><span id="ring-score"></span><small>predictions<br>held up</small></div>
+    </div>
+    <div class="hero-text">
+      <h1 id="headline"></h1>
+      <p class="hero-lede" id="lede"></p>
+      <ul class="stats" id="stats"></ul>
+    </div>
+  </div>
+  <ol class="pipeline" id="pipeline" aria-label="How this result was produced"></ol>
+</header>
+
 <main>
-  <h1 id="headline"></h1>
-  <p class="lede" id="lede"></p>
+  <section class="spotlight" id="spotlight" hidden>
+    <h2 id="spot-title"></h2>
+    <p class="lede">Flip between the original run and the migrated run. Only what changed moves; select a changed test to see the evidence behind it.</p>
+    <div id="spot-body"></div>
+  </section>
+
+  <h2>Gemma vs Reality, migration by migration</h2>
   <div class="key">
     <span><i class="swatch claim"></i>Dashed: what Gemma claimed</span>
     <span><i class="swatch fact"></i>Solid: what the tests showed</span>
@@ -231,6 +318,54 @@ $("lede").textContent = (base
   ? `Before changing anything, ${base.passed} of ${base.tests} tests pass on the original dependencies. `
   : "The baseline tests were not run. ")
   + "For each risky dependency, Gemma proposed a fix and predicted whether it would break anything; depexit then applied the fix in a copy of the repo and ran the real test suite.";
+
+// ---------- result band: score ring, impact numbers, pipeline (all computed from the data) ----------
+const results = DATA.results || [];
+const total = (pick) => results.reduce((n, r) => n + (pick(r) || 0), 0);
+const fixedTests = total((r) => r.comparison?.newly_passing?.length);
+const brokenTests = total((r) => r.comparison?.newly_failing?.length);
+const goneWarnings = total((r) => r.comparison?.gone_warnings?.length);
+$("ring-score").textContent = card.total ? `${card.correct}/${card.total}` : "–";
+
+function svgEl(tag, attrs) {                     // SVG needs its own namespace, so el() can't build it
+  const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
+  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+  return node;
+}
+const graded = results.filter((r) => r.comparison);
+const C = 2 * Math.PI * 50, gap = graded.length > 1 ? 4 : 0;
+$("ring").append(svgEl("circle", {class: "track", cx: 60, cy: 60, r: 50}));
+const segs = graded.map((r, i) => {
+  const ok = r.comparison.prediction_correct;
+  const seg = svgEl("circle", {class: `seg ${ok === true ? "right" : ok === false ? "wrong" : "na"}`, cx: 60, cy: 60, r: 50,
+    "stroke-dasharray": `0 ${C}`, "stroke-dashoffset": -(i * C) / graded.length});
+  seg.style.transitionDelay = `${i * 90}ms`;
+  seg.append(svgEl("title", {}));
+  seg.firstChild.textContent = `${r.dep.name}: ${ok === true ? "held up" : ok === false ? "wrong" : "not graded"}`;
+  $("ring").append(seg);
+  return seg;
+});
+// the one page-load animation: each migration's segment draws in (instant with reduced motion)
+// (a timer, not requestAnimationFrame: rAF never fires in a background tab, which would leave the ring empty)
+setTimeout(() => segs.forEach((s) => s.setAttribute("stroke-dasharray", `${C / graded.length - gap} ${C}`)), 60);
+
+const stats = [
+  [fixedTests, `test${fixedTests === 1 ? "" : "s"} fixed`, fixedTests > 0],
+  [goneWarnings, `warning${goneWarnings === 1 ? "" : "s"} removed`, goneWarnings > 0],
+  [brokenTests, `test${brokenTests === 1 ? "" : "s"} broken`, brokenTests === 0],
+];
+if (meta.duration_s) stats.push([`${(meta.duration_s / 60).toFixed(1)} min`, "end to end", false]);
+if (graded.length) $("stats").append(...stats.map(([n, label, good]) =>
+  el("li", {}, el("b", {class: good ? "good" : ""}, n), el("span", {}, label))));
+
+const asked = results.filter((r) => r.ai).length, tested = results.filter((r) => r.run).length;
+$("pipeline").append(...[
+  ["", (DATA.records || []).length, "dependencies scanned"],
+  ["", (DATA.records || []).filter((r) => r.at_risk).length, "at risk (health < 70)"],
+  ["ai", meta.model || asked ? asked : "–", meta.model || asked ? "fixes proposed by Gemma" : "Gemma not run"],
+  ["", tested, "fixes tested in fresh venvs"],
+  ["", card.total ? `${card.correct}/${card.total}` : "–", "predictions held up"],
+].map(([cls, n, label]) => el("li", {class: cls}, el("b", {}, n), el("span", {}, label))));
 
 // ---------- Gemma vs Reality ledger ----------
 const why = Object.fromEntries((card.wrong || []).map((w) => [w.dep, w.why]));
@@ -411,7 +546,8 @@ function beforeAfter(res) {
       el("div", {class: "ev-cols"}, evCol("Before", msgB, tbB), evCol("After", msgA, tbA)),
       el("h5", {}, "What changed and is named in this test's error"),
       pkgs.length || hunks.length
-        ? [pkgs.map((p) => el("p", {}, el("code", {}, p.name), `  ${p.before} ⇢ ${p.after}`)),
+        ? [pkgs.map((p) => el("p", {class: "ev-pkg"}, el("code", {}, p.name),
+             el("span", {class: "old"}, p.before), "⇢", el("span", {class: "new"}, p.after))),
            hunks.map((f) => [el("p", {class: "muted"}, f.path), diff(f.text)])]
         : el("p", {class: "muted"}, "No changed package or file is named in this test's error. Every change is listed above."),
       el("p", {class: "muted"}, "Linked because it appears in the error text, not proven to be the cause.")));
@@ -507,6 +643,21 @@ function closePanel() {
 }
 $("scrim").addEventListener("click", closePanel);
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("panel").hidden) closePanel(); });
+
+// ---------- featured migration: the best evidence story, picked from the data, shown on the page ----------
+// (runs last: beforeAfter() needs helpers defined above)
+const featured = results.find((r) => r.run && r.comparison?.newly_failing?.length)   // a regression is the most important story
+              || results.find((r) => r.run && r.comparison?.newly_passing?.length)
+              || results.find((r) => r.run && r.comparison?.gone_warnings?.length)
+              || results.find((r) => r.run);
+if (featured && base) {
+  const c = featured.comparison || {}, n = featured.dep.name;
+  $("spot-title").textContent = c.newly_failing?.length ? `${n}: the fix that broke ${c.newly_failing.length} test${c.newly_failing.length > 1 ? "s" : ""}`
+    : c.newly_passing?.length ? `${n}: the fix that repaired a failing test`
+    : c.gone_warnings?.length ? `${n}: the fix that removed a warning` : `${n}: before and after`;
+  $("spot-body").append(beforeAfter(featured), el("button", {class: "spot-open", onclick: () => openPanel(n)}, `Open all evidence for ${n}`));
+  $("spotlight").hidden = false;
+}
 </script>
 </body>
 </html>
