@@ -4,8 +4,10 @@ Owner: Sohan. Runs every stage in the order described in team/CONTRACT.md.
 """
 import argparse
 import json
+import os
 import platform
 import shutil
+import stat
 import subprocess
 import sys
 import time
@@ -19,11 +21,23 @@ def log(msg):
     print(f"[depexit {time.strftime('%H:%M:%S')}] {msg}", flush=True)
 
 
+def make_writable_and_retry(func, path, *_):
+    """rmtree helper: Windows refuses to delete read-only files such as git's .pack/.idx."""
+    os.chmod(path, stat.S_IWRITE)
+    func(path)
+
+
+def remove_tree(path):
+    # shutil renamed the error hook (onerror -> onexc) in Python 3.12
+    hook = {"onexc" if sys.version_info >= (3, 12) else "onerror": make_writable_and_retry}
+    shutil.rmtree(path, **hook)
+
+
 def get_repo(target, work):
     """Clone a URL (or copy a local folder) into work/target and return that path."""
     dest = work / "target"
     if dest.exists():
-        shutil.rmtree(dest)
+        remove_tree(dest)
     if target.startswith(("http://", "https://", "git@")):
         subprocess.run(["git", "clone", "--depth", "1", "-q", target, str(dest)], check=True)
     else:
