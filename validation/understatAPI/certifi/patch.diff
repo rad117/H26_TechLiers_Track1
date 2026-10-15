@@ -1,0 +1,10 @@
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -4,7 +4,6 @@
+ #
+ #    pip-compile --output-file=requirements.txt requirements.in
+ #
+-certifi==2025.11.12
+     # via requests
+ charset-normalizer==3.4.4
+     # via requests

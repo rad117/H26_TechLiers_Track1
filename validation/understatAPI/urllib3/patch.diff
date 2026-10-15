@@ -1,0 +1,8 @@
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -12,5 +12,4 @@
+     # via requests
+ requests==2.32.5
+     # via -r requirements.in
+-urllib3==1.26.5
+     # via requests

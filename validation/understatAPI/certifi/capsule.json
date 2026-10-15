@@ -1,0 +1,103 @@
+{
+  "dep": {
+    "name": "certifi",
+    "import_names": [
+      "certifi"
+    ],
+    "status": "unused",
+    "specs": {
+      "requirements.txt": "==2025.11.12"
+    },
+    "pinned_version": "2025.11.12",
+    "spec_mismatch": false,
+    "usages": [],
+    "pypi": {
+      "latest": "2026.7.22",
+      "latest_date": "2026-07-22",
+      "pinned_date": "2025-11-12",
+      "inactive": false,
+      "requires_python": ">=3.7"
+    },
+    "signals": [
+      {
+        "id": "major_behind",
+        "detail": "pinned 2025.11.12, latest 2026.7.22",
+        "points": -25,
+        "source": "pypi"
+      },
+      {
+        "id": "unused",
+        "detail": "declared but never imported",
+        "points": -10,
+        "source": "code_scan"
+      }
+    ],
+    "health_score": 65,
+    "at_risk": true
+  },
+  "ai": {
+    "source": "gemma",
+    "model": "gemma-4-31b-it",
+    "ok": true,
+    "prompt_key": "577d2a781a24c99e",
+    "risk_explanation": "The certifi package is pinned to an outdated version and is not directly imported or used by the project's source code. It exists in the requirements file only as a transitive dependency of the requests library.",
+    "replacement": "None",
+    "migration_type": "remove",
+    "requirement_changes": [
+      {
+        "action": "remove",
+        "name": "certifi",
+        "line": ""
+      }
+    ],
+    "file_edits": [],
+    "steps": [
+      "Remove the explicit version pin for certifi from requirements.txt. This allows the requests library to resolve the most appropriate version of its own dependency."
+    ],
+    "suggested_tests": [
+      "Run pytest to ensure that network-dependent tests still pass with the updated version of certifi."
+    ],
+    "predicted_outcome": "pass",
+    "confidence": 1.0,
+    "raw": "{\n  \"risk_explanation\": \"The certifi package is pinned to an outdated version and is not directly imported or used by the project's source code. It exists in the requirements file only as a transitive dependency of the requests library.\",\n  \"replacement\": \"None\",\n  \"migration_type\": \"remove\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"certifi\"\n    }\n  ],\n  \"file_edits\": [],\n  \"steps\": [\n    \"Remove the explicit version pin for certifi from requirements.txt. This allows the requests library to resolve the most appropriate version of its own dependency.\"\n  ],\n  \"suggested_tests\": [\n    \"Run pytest to ensure that network-dependent tests still pass with the updated version of certifi.\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+  },
+  "patch": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -4,7 +4,6 @@\n #\r\n #    pip-compile --output-file=requirements.txt requirements.in\r\n #\r\n-certifi==2025.11.12\r\n     # via requests\r\n charset-normalizer==3.4.4\r\n     # via requests\r\n",
+  "run": {
+    "label": "certifi",
+    "stage": "tests",
+    "ok": true,
+    "python_version": "3.12.5",
+    "venv_python": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\candidates\\certifi\\.venv\\Scripts\\python.exe",
+    "tests": 2042,
+    "passed": 2042,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "failing_tests": {},
+    "warnings": [],
+    "duration_s": 10.3,
+    "commands": [
+      "py -3.12 -m venv --clear .venv",
+      ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
+      ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+    ],
+    "log_file": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\logs\\certifi.log"
+  },
+  "comparison": {
+    "verdict": "same",
+    "actual_outcome": "pass",
+    "predicted_outcome": "pass",
+    "prediction_correct": true,
+    "newly_failing": [],
+    "newly_passing": [],
+    "still_failing": [],
+    "new_warnings": [],
+    "gone_warnings": [],
+    "gaps": []
+  },
+  "review": {
+    "source": "gemma",
+    "ok": false,
+    "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+  }
+}

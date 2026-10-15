@@ -1,0 +1,128 @@
+{
+  "dep": {
+    "name": "urllib3",
+    "import_names": [
+      "urllib3"
+    ],
+    "status": "unused",
+    "specs": {
+      "requirements.txt": "==1.26.5"
+    },
+    "pinned_version": "1.26.5",
+    "spec_mismatch": false,
+    "usages": [],
+    "pypi": {
+      "latest": "2.8.0",
+      "latest_date": "2026-09-15",
+      "pinned_date": "2021-05-26",
+      "inactive": false,
+      "requires_python": ">=3.10"
+    },
+    "signals": [
+      {
+        "id": "major_behind",
+        "detail": "pinned 1.26.5, latest 2.8.0",
+        "points": -25,
+        "source": "pypi"
+      },
+      {
+        "id": "old_pin",
+        "detail": "1.26.5 released 2021-05-26 (5 years ago)",
+        "points": -20,
+        "source": "pypi"
+      },
+      {
+        "id": "unused",
+        "detail": "declared but never imported",
+        "points": -10,
+        "source": "code_scan"
+      }
+    ],
+    "health_score": 45,
+    "at_risk": true
+  },
+  "ai": {
+    "source": "gemma",
+    "model": "gemma-4-26b-a4b-it",
+    "ok": true,
+    "prompt_key": "24cc0904da1d659d",
+    "risk_explanation": "urllib3 is an outdated transitive dependency of requests that is not directly used by the application code. The current explicit pin to version 1.26.5 prevents the package manager from installing more recent, secure versions of urllib3 that are compatible with the installed version of requests.",
+    "replacement": "managed by requests",
+    "migration_type": "remove",
+    "requirement_changes": [
+      {
+        "action": "remove",
+        "name": "urllib3",
+        "line": "urllib3==1.26.5"
+      }
+    ],
+    "file_edits": [],
+    "steps": [
+      "Remove the explicit version pin for urllib3 from requirements.txt to allow the package manager to resolve the most recent compatible version via requests."
+    ],
+    "suggested_tests": [
+      "Run the existing test suite to ensure that the requests library still functions correctly with the updated urllib3 version.",
+      "[second opinion, residual risk medium] Run `pip show urllib3` in the target environment to confirm whether it resolved to a 2.x version",
+      "[second opinion, residual risk medium] Execute integration tests using real HTTPS endpoints to verify SSL/TLS handshake success",
+      "[second opinion, residual risk medium] Verify that the production platform's OpenSSL version meets the requirements for `urllib3` 2.x",
+      "[second opinion, residual risk medium] Actual network I/O if the `requests` library is mocked within the existing test suite",
+      "[second opinion, residual risk medium] Compatibility with `urllib3` 2.x breaking changes, specifically regarding stricter TLS/SSL and OpenSSL requirements",
+      "[second opinion, residual risk medium] Low-level connection pooling and retry behavior changes resulting from the jump from `urllib3` 1.26.x to 2.x"
+    ],
+    "predicted_outcome": "pass",
+    "confidence": 1.0,
+    "raw": "{\n  \"risk_explanation\": \"urllib3 is an outdated transitive dependency of requests that is not directly used by the application code. The current explicit pin to version 1.26.5 prevents the package manager from installing more recent, secure versions of urllib3 that are compatible with the installed version of requests.\",\n  \"replacement\": \"managed by requests\",\n  \"migration_type\": \"remove\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"urllib3\",\n      \"line\": \"urllib3==1.26.5\"\n    }\n  ],\n  \"file_edits\": [],\n  \"steps\": [\n    \"Remove the explicit version pin for urllib3 from requirements.txt to allow the package manager to resolve the most recent compatible version via requests.\"\n  ],\n  \"suggested_tests\": [\n    \"Run the existing test suite to ensure that the requests library still functions correctly with the updated urllib3 version.\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+  },
+  "patch": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -12,5 +12,4 @@\n     # via requests\r\n requests==2.32.5\r\n     # via -r requirements.in\r\n-urllib3==1.26.5\r\n     # via requests\r\n",
+  "run": {
+    "label": "urllib3",
+    "stage": "tests",
+    "ok": true,
+    "python_version": "3.12.5",
+    "venv_python": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\candidates\\urllib3\\.venv\\Scripts\\python.exe",
+    "tests": 2042,
+    "passed": 2042,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "failing_tests": {},
+    "warnings": [],
+    "duration_s": 15.8,
+    "commands": [
+      "py -3.12 -m venv --clear .venv",
+      ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
+      ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+    ],
+    "log_file": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\logs\\urllib3.log"
+  },
+  "comparison": {
+    "verdict": "same",
+    "actual_outcome": "pass",
+    "predicted_outcome": "pass",
+    "prediction_correct": true,
+    "newly_failing": [],
+    "newly_passing": [],
+    "still_failing": [],
+    "new_warnings": [],
+    "gone_warnings": [],
+    "gaps": []
+  },
+  "review": {
+    "source": "gemma",
+    "model": "gemma-4-26b-a4b-it",
+    "ok": true,
+    "agree_with_verdict": false,
+    "tests_may_have_missed": [
+      "Actual network I/O if the `requests` library is mocked within the existing test suite",
+      "Compatibility with `urllib3` 2.x breaking changes, specifically regarding stricter TLS/SSL and OpenSSL requirements",
+      "Low-level connection pooling and retry behavior changes resulting from the jump from `urllib3` 1.26.x to 2.x"
+    ],
+    "manual_checks": [
+      "Run `pip show urllib3` in the target environment to confirm whether it resolved to a 2.x version",
+      "Execute integration tests using real HTTPS endpoints to verify SSL/TLS handshake success",
+      "Verify that the production platform's OpenSSL version meets the requirements for `urllib3` 2.x"
+    ],
+    "residual_risk": "medium",
+    "raw": "{\n  \"agree_with_verdict\": false,\n  \"tests_may_have_missed\": [\n    \"Actual network I/O if the `requests` library is mocked within the existing test suite\",\n    \"Compatibility with `urllib3` 2.x breaking changes, specifically regarding stricter TLS/SSL and OpenSSL requirements\",\n    \"Low-level connection pooling and retry behavior changes resulting from the jump from `urllib3` 1.26.x to 2.x\"\n  ],\n  \"manual_checks\": [\n    \"Run `pip show urllib3` in the target environment to confirm whether it resolved to a 2.x version\",\n    \"Execute integration tests using real HTTPS endpoints to verify SSL/TLS handshake success\",\n    \"Verify that the production platform's OpenSSL version meets the requirements for `urllib3` 2.x\"\n  ],\n  \"residual_risk\": \"medium\"\n}"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "source": "gemma",
+  "model": "gemma-4-26b-a4b-it",
+  "ok": true,
+  "prompt_key": "24cc0904da1d659d",
+  "risk_explanation": "urllib3 is an outdated transitive dependency of requests that is not directly used by the application code. The current explicit pin to version 1.26.5 prevents the package manager from installing more recent, secure versions of urllib3 that are compatible with the installed version of requests.",
+  "replacement": "managed by requests",
+  "migration_type": "remove",
+  "requirement_changes": [
+    {
+      "action": "remove",
+      "name": "urllib3",
+      "line": "urllib3==1.26.5"
+    }
+  ],
+  "file_edits": [],
+  "steps": [
+    "Remove the explicit version pin for urllib3 from requirements.txt to allow the package manager to resolve the most recent compatible version via requests."
+  ],
+  "suggested_tests": [
+    "Run the existing test suite to ensure that the requests library still functions correctly with the updated urllib3 version."
+  ],
+  "predicted_outcome": "pass",
+  "confidence": 1.0,
+  "raw": "{\n  \"risk_explanation\": \"urllib3 is an outdated transitive dependency of requests that is not directly used by the application code. The current explicit pin to version 1.26.5 prevents the package manager from installing more recent, secure versions of urllib3 that are compatible with the installed version of requests.\",\n  \"replacement\": \"managed by requests\",\n  \"migration_type\": \"remove\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"urllib3\",\n      \"line\": \"urllib3==1.26.5\"\n    }\n  ],\n  \"file_edits\": [],\n  \"steps\": [\n    \"Remove the explicit version pin for urllib3 from requirements.txt to allow the package manager to resolve the most recent compatible version via requests.\"\n  ],\n  \"suggested_tests\": [\n    \"Run the existing test suite to ensure that the requests library still functions correctly with the updated urllib3 version.\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+}

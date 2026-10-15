@@ -1,0 +1,698 @@
+{
+  "meta": {
+    "tool": "depexit",
+    "version": "0.1.0",
+    "target": "https://github.com/collinb9/understatAPI",
+    "target_commit": "d1252d9734e94ba98c681d2e41d467f1edb7aaf5",
+    "generated_at": "2026-10-15T11:12:47+00:00",
+    "host_python": "3.14.7",
+    "model": "gemma-4-31b-it",
+    "duration_s": 432.8
+  },
+  "scorecard": {
+    "total": 3,
+    "correct": 3,
+    "accuracy": 1.0,
+    "wrong": []
+  },
+  "baseline": {
+    "label": "baseline",
+    "stage": "tests",
+    "ok": true,
+    "python_version": "3.12.5",
+    "venv_python": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\target\\.venv\\Scripts\\python.exe",
+    "tests": 2042,
+    "passed": 2042,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "failing_tests": {},
+    "warnings": [],
+    "duration_s": 16.0,
+    "commands": [
+      "py -3.12 -m venv --clear .venv",
+      ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
+      ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+    ],
+    "log_file": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\logs\\baseline.log"
+  },
+  "records": [
+    {
+      "name": "certifi",
+      "import_names": [
+        "certifi"
+      ],
+      "status": "unused",
+      "specs": {
+        "requirements.txt": "==2025.11.12"
+      },
+      "pinned_version": "2025.11.12",
+      "spec_mismatch": false,
+      "usages": [],
+      "pypi": {
+        "latest": "2026.7.22",
+        "latest_date": "2026-07-22",
+        "pinned_date": "2025-11-12",
+        "inactive": false,
+        "requires_python": ">=3.7"
+      },
+      "signals": [
+        {
+          "id": "major_behind",
+          "detail": "pinned 2025.11.12, latest 2026.7.22",
+          "points": -25,
+          "source": "pypi"
+        },
+        {
+          "id": "unused",
+          "detail": "declared but never imported",
+          "points": -10,
+          "source": "code_scan"
+        }
+      ],
+      "health_score": 65,
+      "at_risk": true
+    },
+    {
+      "name": "charset-normalizer",
+      "import_names": [
+        "charset_normalizer"
+      ],
+      "status": "unused",
+      "specs": {
+        "requirements.txt": "==3.4.4"
+      },
+      "pinned_version": "3.4.4",
+      "spec_mismatch": false,
+      "usages": [],
+      "pypi": {
+        "latest": "3.5.2",
+        "latest_date": "2026-09-30",
+        "pinned_date": "2025-10-14",
+        "inactive": false,
+        "requires_python": ">=3.7"
+      },
+      "signals": [
+        {
+          "id": "unused",
+          "detail": "declared but never imported",
+          "points": -10,
+          "source": "code_scan"
+        }
+      ],
+      "health_score": 90,
+      "at_risk": false
+    },
+    {
+      "name": "idna",
+      "import_names": [
+        "idna"
+      ],
+      "status": "unused",
+      "specs": {
+        "requirements.txt": "==2.10"
+      },
+      "pinned_version": "2.10",
+      "spec_mismatch": false,
+      "usages": [],
+      "pypi": {
+        "latest": "3.20",
+        "latest_date": "2026-09-17",
+        "pinned_date": "2020-06-27",
+        "inactive": false,
+        "requires_python": ">=3.9"
+      },
+      "signals": [
+        {
+          "id": "major_behind",
+          "detail": "pinned 2.10, latest 3.20",
+          "points": -25,
+          "source": "pypi"
+        },
+        {
+          "id": "old_pin",
+          "detail": "2.10 released 2020-06-27 (6 years ago)",
+          "points": -20,
+          "source": "pypi"
+        },
+        {
+          "id": "unused",
+          "detail": "declared but never imported",
+          "points": -10,
+          "source": "code_scan"
+        }
+      ],
+      "health_score": 45,
+      "at_risk": true
+    },
+    {
+      "name": "requests",
+      "import_names": [
+        "requests"
+      ],
+      "status": "declared",
+      "specs": {
+        "requirements.txt": "==2.32.5"
+      },
+      "pinned_version": "2.32.5",
+      "spec_mismatch": false,
+      "usages": [
+        {
+          "file": "test/mock_requests.py",
+          "line": 4,
+          "code": "from requests.exceptions import HTTPError",
+          "names": [
+            "HTTPError"
+          ],
+          "private": false,
+          "is_test": true
+        },
+        {
+          "file": "test/test_api.py",
+          "line": 11,
+          "code": "import requests",
+          "names": [],
+          "private": false,
+          "is_test": true
+        },
+        {
+          "file": "understatapi/api.py",
+          "line": 4,
+          "code": "import requests",
+          "names": [],
+          "private": false,
+          "is_test": false
+        },
+        {
+          "file": "understatapi/endpoints/base.py",
+          "line": 4,
+          "code": "import requests",
+          "names": [],
+          "private": false,
+          "is_test": false
+        },
+        {
+          "file": "understatapi/endpoints/base.py",
+          "line": 5,
+          "code": "from requests import Response",
+          "names": [
+            "Response"
+          ],
+          "private": false,
+          "is_test": false
+        },
+        {
+          "file": "understatapi/endpoints/league.py",
+          "line": 4,
+          "code": "import requests",
+          "names": [],
+          "private": false,
+          "is_test": false
+        },
+        {
+          "file": "understatapi/endpoints/match.py",
+          "line": 4,
+          "code": "import requests",
+          "names": [],
+          "private": false,
+          "is_test": false
+        },
+        {
+          "file": "understatapi/endpoints/match.py",
+          "line": 5,
+          "code": "from requests.exceptions import HTTPError",
+          "names": [
+            "HTTPError"
+          ],
+          "private": false,
+          "is_test": false
+        },
+        {
+          "file": "understatapi/endpoints/player.py",
+          "line": 4,
+          "code": "import requests",
+          "names": [],
+          "private": false,
+          "is_test": false
+        },
+        {
+          "file": "understatapi/endpoints/player.py",
+          "line": 5,
+          "code": "from requests.exceptions import HTTPError",
+          "names": [
+            "HTTPError"
+          ],
+          "private": false,
+          "is_test": false
+        },
+        {
+          "file": "understatapi/endpoints/team.py",
+          "line": 4,
+          "code": "import requests",
+          "names": [],
+          "private": false,
+          "is_test": false
+        },
+        {
+          "file": "understatapi/endpoints/team.py",
+          "line": 5,
+          "code": "from requests.exceptions import HTTPError",
+          "names": [
+            "HTTPError"
+          ],
+          "private": false,
+          "is_test": false
+        }
+      ],
+      "pypi": {
+        "latest": "2.34.2",
+        "latest_date": "2026-05-14",
+        "pinned_date": "2025-08-18",
+        "inactive": false,
+        "requires_python": ">=3.10"
+      },
+      "signals": [],
+      "health_score": 100,
+      "at_risk": false
+    },
+    {
+      "name": "urllib3",
+      "import_names": [
+        "urllib3"
+      ],
+      "status": "unused",
+      "specs": {
+        "requirements.txt": "==1.26.5"
+      },
+      "pinned_version": "1.26.5",
+      "spec_mismatch": false,
+      "usages": [],
+      "pypi": {
+        "latest": "2.8.0",
+        "latest_date": "2026-09-15",
+        "pinned_date": "2021-05-26",
+        "inactive": false,
+        "requires_python": ">=3.10"
+      },
+      "signals": [
+        {
+          "id": "major_behind",
+          "detail": "pinned 1.26.5, latest 2.8.0",
+          "points": -25,
+          "source": "pypi"
+        },
+        {
+          "id": "old_pin",
+          "detail": "1.26.5 released 2021-05-26 (5 years ago)",
+          "points": -20,
+          "source": "pypi"
+        },
+        {
+          "id": "unused",
+          "detail": "declared but never imported",
+          "points": -10,
+          "source": "code_scan"
+        }
+      ],
+      "health_score": 45,
+      "at_risk": true
+    }
+  ],
+  "results": [
+    {
+      "dep": {
+        "name": "idna",
+        "import_names": [
+          "idna"
+        ],
+        "status": "unused",
+        "specs": {
+          "requirements.txt": "==2.10"
+        },
+        "pinned_version": "2.10",
+        "spec_mismatch": false,
+        "usages": [],
+        "pypi": {
+          "latest": "3.20",
+          "latest_date": "2026-09-17",
+          "pinned_date": "2020-06-27",
+          "inactive": false,
+          "requires_python": ">=3.9"
+        },
+        "signals": [
+          {
+            "id": "major_behind",
+            "detail": "pinned 2.10, latest 3.20",
+            "points": -25,
+            "source": "pypi"
+          },
+          {
+            "id": "old_pin",
+            "detail": "2.10 released 2020-06-27 (6 years ago)",
+            "points": -20,
+            "source": "pypi"
+          },
+          {
+            "id": "unused",
+            "detail": "declared but never imported",
+            "points": -10,
+            "source": "code_scan"
+          }
+        ],
+        "health_score": 45,
+        "at_risk": true
+      },
+      "ai": {
+        "source": "gemma",
+        "model": "gemma-4-31b-it",
+        "ok": true,
+        "prompt_key": "7500dccea1a621c2",
+        "risk_explanation": "The project is pinned to idna 2.10, which was released over six years ago and is significantly behind the latest version 3.20. The package is not directly imported in the project's source code and is only present as a transitive dependency of requests. Removing the pin allows the package manager to resolve a modern, secure version compatible with requests.",
+        "replacement": "None (transitive dependency of requests)",
+        "migration_type": "remove",
+        "requirement_changes": [
+          {
+            "action": "remove",
+            "name": "idna",
+            "line": ""
+          }
+        ],
+        "file_edits": [],
+        "steps": [
+          "Remove the idna==2.10 pin from requirements.txt to allow requests to use a current, compatible version of the library."
+        ],
+        "suggested_tests": [
+          "Run pytest to ensure that requests continues to function correctly with the updated version of idna.",
+          "[second opinion, residual risk medium] Verify the version of idna installed using `pip show idna` to ensure it's not a major version bump (e.g., 3.x) causing issues",
+          "[second opinion, residual risk medium] Manually test `requests.get()` with an internationalized domain like 'http://exämple.com'",
+          "[second opinion, residual risk medium] Check for `TypeError` or `UnicodeError` when passing Unicode hostnames to `requests`",
+          "[second opinion, residual risk medium] Requests to URLs containing non-ASCII/Unicode domain names",
+          "[second opinion, residual risk medium] Punycode encoding and decoding edge cases for specific scripts",
+          "[second opinion, residual risk medium] Breaking changes in the idna 3.x API compared to the previous 2.10 version"
+        ],
+        "predicted_outcome": "pass",
+        "confidence": 1.0,
+        "raw": "{\n  \"risk_explanation\": \"The project is pinned to idna 2.10, which was released over six years ago and is significantly behind the latest version 3.20. The package is not directly imported in the project's source code and is only present as a transitive dependency of requests. Removing the pin allows the package manager to resolve a modern, secure version compatible with requests.\",\n  \"replacement\": \"None (transitive dependency of requests)\",\n  \"migration_type\": \"remove\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"idna\"\n    }\n  ],\n  \"file_edits\": [],\n  \"steps\": [\n    \"Remove the idna==2.10 pin from requirements.txt to allow requests to use a current, compatible version of the library.\"\n  ],\n  \"suggested_tests\": [\n    \"Run pytest to ensure that requests continues to function correctly with the updated version of idna.\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+      },
+      "patch": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -8,7 +8,6 @@\n     # via requests\r\n charset-normalizer==3.4.4\r\n     # via requests\r\n-idna==2.10\r\n     # via requests\r\n requests==2.32.5\r\n     # via -r requirements.in\r\n",
+      "run": {
+        "label": "idna",
+        "stage": "tests",
+        "ok": true,
+        "python_version": "3.12.5",
+        "venv_python": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\candidates\\idna\\.venv\\Scripts\\python.exe",
+        "tests": 2042,
+        "passed": 2042,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "failing_tests": {},
+        "warnings": [],
+        "duration_s": 16.9,
+        "commands": [
+          "py -3.12 -m venv --clear .venv",
+          ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
+          ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+        ],
+        "log_file": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\logs\\idna.log"
+      },
+      "comparison": {
+        "verdict": "same",
+        "actual_outcome": "pass",
+        "predicted_outcome": "pass",
+        "prediction_correct": true,
+        "newly_failing": [],
+        "newly_passing": [],
+        "still_failing": [],
+        "new_warnings": [],
+        "gone_warnings": [],
+        "gaps": []
+      },
+      "review": {
+        "source": "gemma",
+        "model": "gemma-4-26b-a4b-it",
+        "ok": true,
+        "agree_with_verdict": true,
+        "tests_may_have_missed": [
+          "Requests to URLs containing non-ASCII/Unicode domain names",
+          "Punycode encoding and decoding edge cases for specific scripts",
+          "Breaking changes in the idna 3.x API compared to the previous 2.10 version"
+        ],
+        "manual_checks": [
+          "Verify the version of idna installed using `pip show idna` to ensure it's not a major version bump (e.g., 3.x) causing issues",
+          "Manually test `requests.get()` with an internationalized domain like 'http://exämple.com'",
+          "Check for `TypeError` or `UnicodeError` when passing Unicode hostnames to `requests`"
+        ],
+        "residual_risk": "medium",
+        "raw": "{\n  \"agree_with_verdict\": true,\n  \"tests_may_have_missed\": [\n    \"Requests to URLs containing non-ASCII/Unicode domain names\",\n    \"Punycode encoding and decoding edge cases for specific scripts\",\n    \"Breaking changes in the idna 3.x API compared to the previous 2.10 version\"\n  ],\n  \"manual_checks\": [\n    \"Verify the version of idna installed using `pip show idna` to ensure it's not a major version bump (e.g., 3.x) causing issues\",\n    \"Manually test `requests.get()` with an internationalized domain like 'http://exämple.com'\",\n    \"Check for `TypeError` or `UnicodeError` when passing Unicode hostnames to `requests`\"\n  ],\n  \"residual_risk\": \"medium\"\n}"
+      }
+    },
+    {
+      "dep": {
+        "name": "urllib3",
+        "import_names": [
+          "urllib3"
+        ],
+        "status": "unused",
+        "specs": {
+          "requirements.txt": "==1.26.5"
+        },
+        "pinned_version": "1.26.5",
+        "spec_mismatch": false,
+        "usages": [],
+        "pypi": {
+          "latest": "2.8.0",
+          "latest_date": "2026-09-15",
+          "pinned_date": "2021-05-26",
+          "inactive": false,
+          "requires_python": ">=3.10"
+        },
+        "signals": [
+          {
+            "id": "major_behind",
+            "detail": "pinned 1.26.5, latest 2.8.0",
+            "points": -25,
+            "source": "pypi"
+          },
+          {
+            "id": "old_pin",
+            "detail": "1.26.5 released 2021-05-26 (5 years ago)",
+            "points": -20,
+            "source": "pypi"
+          },
+          {
+            "id": "unused",
+            "detail": "declared but never imported",
+            "points": -10,
+            "source": "code_scan"
+          }
+        ],
+        "health_score": 45,
+        "at_risk": true
+      },
+      "ai": {
+        "source": "gemma",
+        "model": "gemma-4-26b-a4b-it",
+        "ok": true,
+        "prompt_key": "24cc0904da1d659d",
+        "risk_explanation": "urllib3 is an outdated transitive dependency of requests that is not directly used by the application code. The current explicit pin to version 1.26.5 prevents the package manager from installing more recent, secure versions of urllib3 that are compatible with the installed version of requests.",
+        "replacement": "managed by requests",
+        "migration_type": "remove",
+        "requirement_changes": [
+          {
+            "action": "remove",
+            "name": "urllib3",
+            "line": "urllib3==1.26.5"
+          }
+        ],
+        "file_edits": [],
+        "steps": [
+          "Remove the explicit version pin for urllib3 from requirements.txt to allow the package manager to resolve the most recent compatible version via requests."
+        ],
+        "suggested_tests": [
+          "Run the existing test suite to ensure that the requests library still functions correctly with the updated urllib3 version.",
+          "[second opinion, residual risk medium] Run `pip show urllib3` in the target environment to confirm whether it resolved to a 2.x version",
+          "[second opinion, residual risk medium] Execute integration tests using real HTTPS endpoints to verify SSL/TLS handshake success",
+          "[second opinion, residual risk medium] Verify that the production platform's OpenSSL version meets the requirements for `urllib3` 2.x",
+          "[second opinion, residual risk medium] Actual network I/O if the `requests` library is mocked within the existing test suite",
+          "[second opinion, residual risk medium] Compatibility with `urllib3` 2.x breaking changes, specifically regarding stricter TLS/SSL and OpenSSL requirements",
+          "[second opinion, residual risk medium] Low-level connection pooling and retry behavior changes resulting from the jump from `urllib3` 1.26.x to 2.x"
+        ],
+        "predicted_outcome": "pass",
+        "confidence": 1.0,
+        "raw": "{\n  \"risk_explanation\": \"urllib3 is an outdated transitive dependency of requests that is not directly used by the application code. The current explicit pin to version 1.26.5 prevents the package manager from installing more recent, secure versions of urllib3 that are compatible with the installed version of requests.\",\n  \"replacement\": \"managed by requests\",\n  \"migration_type\": \"remove\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"urllib3\",\n      \"line\": \"urllib3==1.26.5\"\n    }\n  ],\n  \"file_edits\": [],\n  \"steps\": [\n    \"Remove the explicit version pin for urllib3 from requirements.txt to allow the package manager to resolve the most recent compatible version via requests.\"\n  ],\n  \"suggested_tests\": [\n    \"Run the existing test suite to ensure that the requests library still functions correctly with the updated urllib3 version.\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+      },
+      "patch": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -12,5 +12,4 @@\n     # via requests\r\n requests==2.32.5\r\n     # via -r requirements.in\r\n-urllib3==1.26.5\r\n     # via requests\r\n",
+      "run": {
+        "label": "urllib3",
+        "stage": "tests",
+        "ok": true,
+        "python_version": "3.12.5",
+        "venv_python": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\candidates\\urllib3\\.venv\\Scripts\\python.exe",
+        "tests": 2042,
+        "passed": 2042,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "failing_tests": {},
+        "warnings": [],
+        "duration_s": 15.8,
+        "commands": [
+          "py -3.12 -m venv --clear .venv",
+          ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
+          ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+        ],
+        "log_file": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\logs\\urllib3.log"
+      },
+      "comparison": {
+        "verdict": "same",
+        "actual_outcome": "pass",
+        "predicted_outcome": "pass",
+        "prediction_correct": true,
+        "newly_failing": [],
+        "newly_passing": [],
+        "still_failing": [],
+        "new_warnings": [],
+        "gone_warnings": [],
+        "gaps": []
+      },
+      "review": {
+        "source": "gemma",
+        "model": "gemma-4-26b-a4b-it",
+        "ok": true,
+        "agree_with_verdict": false,
+        "tests_may_have_missed": [
+          "Actual network I/O if the `requests` library is mocked within the existing test suite",
+          "Compatibility with `urllib3` 2.x breaking changes, specifically regarding stricter TLS/SSL and OpenSSL requirements",
+          "Low-level connection pooling and retry behavior changes resulting from the jump from `urllib3` 1.26.x to 2.x"
+        ],
+        "manual_checks": [
+          "Run `pip show urllib3` in the target environment to confirm whether it resolved to a 2.x version",
+          "Execute integration tests using real HTTPS endpoints to verify SSL/TLS handshake success",
+          "Verify that the production platform's OpenSSL version meets the requirements for `urllib3` 2.x"
+        ],
+        "residual_risk": "medium",
+        "raw": "{\n  \"agree_with_verdict\": false,\n  \"tests_may_have_missed\": [\n    \"Actual network I/O if the `requests` library is mocked within the existing test suite\",\n    \"Compatibility with `urllib3` 2.x breaking changes, specifically regarding stricter TLS/SSL and OpenSSL requirements\",\n    \"Low-level connection pooling and retry behavior changes resulting from the jump from `urllib3` 1.26.x to 2.x\"\n  ],\n  \"manual_checks\": [\n    \"Run `pip show urllib3` in the target environment to confirm whether it resolved to a 2.x version\",\n    \"Execute integration tests using real HTTPS endpoints to verify SSL/TLS handshake success\",\n    \"Verify that the production platform's OpenSSL version meets the requirements for `urllib3` 2.x\"\n  ],\n  \"residual_risk\": \"medium\"\n}"
+      }
+    },
+    {
+      "dep": {
+        "name": "certifi",
+        "import_names": [
+          "certifi"
+        ],
+        "status": "unused",
+        "specs": {
+          "requirements.txt": "==2025.11.12"
+        },
+        "pinned_version": "2025.11.12",
+        "spec_mismatch": false,
+        "usages": [],
+        "pypi": {
+          "latest": "2026.7.22",
+          "latest_date": "2026-07-22",
+          "pinned_date": "2025-11-12",
+          "inactive": false,
+          "requires_python": ">=3.7"
+        },
+        "signals": [
+          {
+            "id": "major_behind",
+            "detail": "pinned 2025.11.12, latest 2026.7.22",
+            "points": -25,
+            "source": "pypi"
+          },
+          {
+            "id": "unused",
+            "detail": "declared but never imported",
+            "points": -10,
+            "source": "code_scan"
+          }
+        ],
+        "health_score": 65,
+        "at_risk": true
+      },
+      "ai": {
+        "source": "gemma",
+        "model": "gemma-4-31b-it",
+        "ok": true,
+        "prompt_key": "577d2a781a24c99e",
+        "risk_explanation": "The certifi package is pinned to an outdated version and is not directly imported or used by the project's source code. It exists in the requirements file only as a transitive dependency of the requests library.",
+        "replacement": "None",
+        "migration_type": "remove",
+        "requirement_changes": [
+          {
+            "action": "remove",
+            "name": "certifi",
+            "line": ""
+          }
+        ],
+        "file_edits": [],
+        "steps": [
+          "Remove the explicit version pin for certifi from requirements.txt. This allows the requests library to resolve the most appropriate version of its own dependency."
+        ],
+        "suggested_tests": [
+          "Run pytest to ensure that network-dependent tests still pass with the updated version of certifi."
+        ],
+        "predicted_outcome": "pass",
+        "confidence": 1.0,
+        "raw": "{\n  \"risk_explanation\": \"The certifi package is pinned to an outdated version and is not directly imported or used by the project's source code. It exists in the requirements file only as a transitive dependency of the requests library.\",\n  \"replacement\": \"None\",\n  \"migration_type\": \"remove\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"certifi\"\n    }\n  ],\n  \"file_edits\": [],\n  \"steps\": [\n    \"Remove the explicit version pin for certifi from requirements.txt. This allows the requests library to resolve the most appropriate version of its own dependency.\"\n  ],\n  \"suggested_tests\": [\n    \"Run pytest to ensure that network-dependent tests still pass with the updated version of certifi.\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+      },
+      "patch": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -4,7 +4,6 @@\n #\r\n #    pip-compile --output-file=requirements.txt requirements.in\r\n #\r\n-certifi==2025.11.12\r\n     # via requests\r\n charset-normalizer==3.4.4\r\n     # via requests\r\n",
+      "run": {
+        "label": "certifi",
+        "stage": "tests",
+        "ok": true,
+        "python_version": "3.12.5",
+        "venv_python": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\candidates\\certifi\\.venv\\Scripts\\python.exe",
+        "tests": 2042,
+        "passed": 2042,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "failing_tests": {},
+        "warnings": [],
+        "duration_s": 10.3,
+        "commands": [
+          "py -3.12 -m venv --clear .venv",
+          ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
+          ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+        ],
+        "log_file": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\logs\\certifi.log"
+      },
+      "comparison": {
+        "verdict": "same",
+        "actual_outcome": "pass",
+        "predicted_outcome": "pass",
+        "prediction_correct": true,
+        "newly_failing": [],
+        "newly_passing": [],
+        "still_failing": [],
+        "new_warnings": [],
+        "gone_warnings": [],
+        "gaps": []
+      },
+      "review": {
+        "source": "gemma",
+        "ok": false,
+        "error": "ServerError: 500 INTERNAL. {'error': {'code': 500, 'message': 'Internal error encountered.', 'status': 'INTERNAL'}}"
+      }
+    }
+  ],
+  "evidence": {
+    "certifi/capsule.json": "2527195789779c28f36715220f1f52b27c885364d4e7fca31a23a988afad3ff1",
+    "certifi/capsule.md": "2649d077f81b14e5f63949c8bbef5f646b763373276c479914eab97010693dd3",
+    "certifi/patch.diff": "ef255cd96e53b5ed972aa00530484e0d9068dc9a962d1c61f758c82ccfb1dec9",
+    "idna/capsule.json": "5e946a90e6d1f592f272764e3fc43fc30737749f835483f8e0475f889347a4f9",
+    "idna/capsule.md": "fa54db6c06217972c2b35d3d04155bca76b664c964281fbfb1e0fe7a9af997cb",
+    "idna/patch.diff": "249a95d2b338e6debe6ea82db4fe0c1a325e592399d0461e726d9a71b2e5944b",
+    "urllib3/capsule.json": "927720e3bf76b750c0476acc574c367bd2f05e709629aaa4d4e4fd385e2889f7",
+    "urllib3/capsule.md": "40d3c3e199eb4be61326a34b3b229faeafad33f9130b4d74b78700d4cd71a5c2",
+    "urllib3/patch.diff": "e56b061a8a17968da4721a32cb6d14905b604be5137c01009d0287d6837fae25",
+    "replay.ps1": "3ac0befbb13b59d627a0b8f9f33cb32c079661c62787c8bcb9ebb9003f31c22d",
+    "_work/logs/baseline.log": "eb63a7bd8155b0782d4d7f5433d4ec96d511a2baaad4f43ec4b568bb5e6578ed",
+    "_work/logs/idna.log": "7bbd0fb1c846e1723a55db8dccc2496a80593215d3ba6f579d92f04b50597ddd",
+    "_work/logs/urllib3.log": "6d859bf0782fc35cacf8c1d4abb38864c0d2a98b1230f7ba600eebd08a3428ef",
+    "_work/logs/certifi.log": "2088083025a4ac91d85966b0f55379fa002872e68252769567cde913937c1047"
+  }
+}

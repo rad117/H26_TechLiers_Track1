@@ -1,0 +1,128 @@
+{
+  "dep": {
+    "name": "idna",
+    "import_names": [
+      "idna"
+    ],
+    "status": "unused",
+    "specs": {
+      "requirements.txt": "==2.10"
+    },
+    "pinned_version": "2.10",
+    "spec_mismatch": false,
+    "usages": [],
+    "pypi": {
+      "latest": "3.20",
+      "latest_date": "2026-09-17",
+      "pinned_date": "2020-06-27",
+      "inactive": false,
+      "requires_python": ">=3.9"
+    },
+    "signals": [
+      {
+        "id": "major_behind",
+        "detail": "pinned 2.10, latest 3.20",
+        "points": -25,
+        "source": "pypi"
+      },
+      {
+        "id": "old_pin",
+        "detail": "2.10 released 2020-06-27 (6 years ago)",
+        "points": -20,
+        "source": "pypi"
+      },
+      {
+        "id": "unused",
+        "detail": "declared but never imported",
+        "points": -10,
+        "source": "code_scan"
+      }
+    ],
+    "health_score": 45,
+    "at_risk": true
+  },
+  "ai": {
+    "source": "gemma",
+    "model": "gemma-4-31b-it",
+    "ok": true,
+    "prompt_key": "7500dccea1a621c2",
+    "risk_explanation": "The project is pinned to idna 2.10, which was released over six years ago and is significantly behind the latest version 3.20. The package is not directly imported in the project's source code and is only present as a transitive dependency of requests. Removing the pin allows the package manager to resolve a modern, secure version compatible with requests.",
+    "replacement": "None (transitive dependency of requests)",
+    "migration_type": "remove",
+    "requirement_changes": [
+      {
+        "action": "remove",
+        "name": "idna",
+        "line": ""
+      }
+    ],
+    "file_edits": [],
+    "steps": [
+      "Remove the idna==2.10 pin from requirements.txt to allow requests to use a current, compatible version of the library."
+    ],
+    "suggested_tests": [
+      "Run pytest to ensure that requests continues to function correctly with the updated version of idna.",
+      "[second opinion, residual risk medium] Verify the version of idna installed using `pip show idna` to ensure it's not a major version bump (e.g., 3.x) causing issues",
+      "[second opinion, residual risk medium] Manually test `requests.get()` with an internationalized domain like 'http://exämple.com'",
+      "[second opinion, residual risk medium] Check for `TypeError` or `UnicodeError` when passing Unicode hostnames to `requests`",
+      "[second opinion, residual risk medium] Requests to URLs containing non-ASCII/Unicode domain names",
+      "[second opinion, residual risk medium] Punycode encoding and decoding edge cases for specific scripts",
+      "[second opinion, residual risk medium] Breaking changes in the idna 3.x API compared to the previous 2.10 version"
+    ],
+    "predicted_outcome": "pass",
+    "confidence": 1.0,
+    "raw": "{\n  \"risk_explanation\": \"The project is pinned to idna 2.10, which was released over six years ago and is significantly behind the latest version 3.20. The package is not directly imported in the project's source code and is only present as a transitive dependency of requests. Removing the pin allows the package manager to resolve a modern, secure version compatible with requests.\",\n  \"replacement\": \"None (transitive dependency of requests)\",\n  \"migration_type\": \"remove\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"idna\"\n    }\n  ],\n  \"file_edits\": [],\n  \"steps\": [\n    \"Remove the idna==2.10 pin from requirements.txt to allow requests to use a current, compatible version of the library.\"\n  ],\n  \"suggested_tests\": [\n    \"Run pytest to ensure that requests continues to function correctly with the updated version of idna.\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+  },
+  "patch": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -8,7 +8,6 @@\n     # via requests\r\n charset-normalizer==3.4.4\r\n     # via requests\r\n-idna==2.10\r\n     # via requests\r\n requests==2.32.5\r\n     # via -r requirements.in\r\n",
+  "run": {
+    "label": "idna",
+    "stage": "tests",
+    "ok": true,
+    "python_version": "3.12.5",
+    "venv_python": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\candidates\\idna\\.venv\\Scripts\\python.exe",
+    "tests": 2042,
+    "passed": 2042,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "failing_tests": {},
+    "warnings": [],
+    "duration_s": 16.9,
+    "commands": [
+      "py -3.12 -m venv --clear .venv",
+      ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
+      ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+    ],
+    "log_file": "C:\\Users\\sohan\\AppData\\Local\\Temp\\claude\\D--Hacktober\\2160ee61-c928-4746-86ef-11d4d97a3fb1\\scratchpad\\full_understatAPI\\_work\\logs\\idna.log"
+  },
+  "comparison": {
+    "verdict": "same",
+    "actual_outcome": "pass",
+    "predicted_outcome": "pass",
+    "prediction_correct": true,
+    "newly_failing": [],
+    "newly_passing": [],
+    "still_failing": [],
+    "new_warnings": [],
+    "gone_warnings": [],
+    "gaps": []
+  },
+  "review": {
+    "source": "gemma",
+    "model": "gemma-4-26b-a4b-it",
+    "ok": true,
+    "agree_with_verdict": true,
+    "tests_may_have_missed": [
+      "Requests to URLs containing non-ASCII/Unicode domain names",
+      "Punycode encoding and decoding edge cases for specific scripts",
+      "Breaking changes in the idna 3.x API compared to the previous 2.10 version"
+    ],
+    "manual_checks": [
+      "Verify the version of idna installed using `pip show idna` to ensure it's not a major version bump (e.g., 3.x) causing issues",
+      "Manually test `requests.get()` with an internationalized domain like 'http://exämple.com'",
+      "Check for `TypeError` or `UnicodeError` when passing Unicode hostnames to `requests`"
+    ],
+    "residual_risk": "medium",
+    "raw": "{\n  \"agree_with_verdict\": true,\n  \"tests_may_have_missed\": [\n    \"Requests to URLs containing non-ASCII/Unicode domain names\",\n    \"Punycode encoding and decoding edge cases for specific scripts\",\n    \"Breaking changes in the idna 3.x API compared to the previous 2.10 version\"\n  ],\n  \"manual_checks\": [\n    \"Verify the version of idna installed using `pip show idna` to ensure it's not a major version bump (e.g., 3.x) causing issues\",\n    \"Manually test `requests.get()` with an internationalized domain like 'http://exämple.com'\",\n    \"Check for `TypeError` or `UnicodeError` when passing Unicode hostnames to `requests`\"\n  ],\n  \"residual_risk\": \"medium\"\n}"
+  }
+}
