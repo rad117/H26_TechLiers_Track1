@@ -84,7 +84,7 @@ python -m depexit analyze https://github.com/rishrek/LinkWatch --out capsule_out
   "file_edits": [{"path": "linkwatch/resources.py", "new_content": "<full new file text>"}],
   "steps": ["…", "…"],
   "suggested_tests": ["…"],
-  "predicted_outcome": "pass",          // "pass" | "fail"  ← used by the scorecard
+  "predicted_outcome": "pass",          // "pass" | "fail"  ← used by the scorecard; same definition as actual_outcome
   "confidence": 0.8,
   "raw": "<raw model text, for the evidence trail>"
 }
@@ -112,7 +112,7 @@ If Gemma fails: `{"source": "gemma", "ok": false, "error": "…", "raw": "…"}`
 ```json
 {
   "verdict": "improved",                // "improved" | "same" | "regressed" | "blocked" (install failed)
-  "actual_outcome": "pass",             // "pass" if candidate run ok, else "fail"
+  "actual_outcome": "pass",             // "pass" if verdict is improved/same (installs, breaks no previously passing test), else "fail"
   "predicted_outcome": "pass",
   "prediction_correct": true,           // null if AI failed
   "newly_failing": [], "newly_passing": ["tests/test_report.py::test_report_renders_all_sites"], "still_failing": [],

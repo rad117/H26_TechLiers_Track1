@@ -9,6 +9,7 @@ WHAT GEMMA IS TRUSTED FOR: suggesting a replacement, the requirement changes, th
 a prediction. All of that is AI-suggested. Nothing here is believed until runner.py has installed
 the change and run the real tests; compare.py then grades the prediction ("Gemma vs Reality").
 """
+import hashlib
 import json
 import os
 import re
@@ -82,8 +83,9 @@ Rules:
 - "set" replaces the requirements.txt line of an existing package, "add" appends a line, "remove"
   deletes the package's line. "line" is needed for set and add.
 - Keep the program's behaviour identical. Prefer the smallest change that works. Do not touch tests.
-- predicted_outcome: will the project's existing tests pass after your change? Be honest;
-  say "fail" if you expect trouble.
+- predicted_outcome: "pass" if, after your change, the dependencies install cleanly AND no test that passes
+  today starts failing. Tests that already fail today (see the facts) do not count against you.
+  "fail" if you expect the install to break or any currently passing test to break. Be honest.
 """
 
 
@@ -96,7 +98,7 @@ def read_text(repo, rel):
 
 def build_prompt(record, repo):
     files = sorted({u["file"] for u in record["usages"]})
-    parts = [INSTRUCTIONS, "## Verified facts (JSON)\n" + json.dumps(record, indent=2)]
+    parts = []  # the repo files Gemma is shown
     for name in ("requirements.txt", "pyproject.toml"):
         text = read_text(repo, name)
         if text is not None:
@@ -105,7 +107,15 @@ def build_prompt(record, repo):
         text = read_text(repo, rel)
         if text is not None:
             parts.append(f"## {rel}\n```python\n{text}\n```")
-    return "\n\n".join(parts), files
+    facts = "## Verified facts (JSON)\n" + json.dumps(record, indent=2)
+    inputs = record["name"] + "\n\n" + "\n\n".join(parts)  # what the cache key depends on
+    return "\n\n".join([INSTRUCTIONS, facts, *parts]), files, inputs
+
+
+def prompt_key(prompt_inputs):
+    """Fingerprint of what Gemma is asked: the instructions plus the files it is shown.
+    Cached answers are reused only when this matches, so changing the prompt invalidates them."""
+    return hashlib.sha256((INSTRUCTIONS + prompt_inputs).encode("utf-8")).hexdigest()[:16]
 
 
 # ---------- parsing and validation ----------
@@ -197,18 +207,20 @@ def ask(prompt):
 
 def analyze(record, repo, out):
     """Ask Gemma about one at-risk DepRecord. Cache the answer in out/ai/<name>.json."""
+    prompt, shown_files, inputs = build_prompt(record, repo)
+    key = prompt_key(inputs)
     ai_dir = Path(out) / "ai"
     safe = re.sub(r"[^A-Za-z0-9._-]", "_", record["name"])
     cache = ai_dir / f"{safe}.json"
     if cache.exists():
         try:
             cached = json.loads(cache.read_text(encoding="utf-8"))
-            if cached.get("ok") and cached.get("model") in candidate_models():
+            if (cached.get("ok") and cached.get("model") in candidate_models()
+                    and cached.get("prompt_key") == key):
                 return cached
         except ValueError:
             pass  # unreadable cache: ask again
 
-    prompt, shown_files = build_prompt(record, repo)
     ai_dir.mkdir(parents=True, exist_ok=True)
     (ai_dir / f"{safe}.prompt.txt").write_text(prompt, encoding="utf-8")  # evidence trail
 
@@ -221,7 +233,7 @@ def analyze(record, repo, out):
                             prompt + "\n\nYour previous reply was rejected: "
                             f"{error}. Reply again with ONLY the corrected JSON object.")
             try:
-                result = {"source": "gemma", "model": used, "ok": True,
+                result = {"source": "gemma", "model": used, "ok": True, "prompt_key": key,
                           **clean(extract_json(raw), set(shown_files), current_lines), "raw": raw}
                 break
             except ValueError as exc:  # also covers json.JSONDecodeError
