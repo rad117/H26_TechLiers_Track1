@@ -12,8 +12,9 @@ import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-# "  linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated ..."
-WARNING_RE = re.compile(r"^\s*\S+:\d+: \w*Warning: ")
+# "linkwatch/resources.py:1: DeprecationWarning: pkg_resources is deprecated ..."
+# Any category name: pydantic's is "PydanticDeprecatedSince20", which doesn't end in "Warning".
+WARNING_RE = re.compile(r"^\S+:\d+: \w+: ")
 
 
 def venv_python(repo_dir):
@@ -81,10 +82,13 @@ def parse_warnings(output, repo_dir):
     section = output.split("warnings summary", 1)[1].split("-- Docs:", 1)[0]
     found = []
     for line in section.splitlines():
-        line = relative(line, repo_dir).strip()
-        if WARNING_RE.match(line) and line not in found:
-            found.append(line)
-    return found
+        line = relative(line, repo_dir)
+        text = line.strip()
+        if WARNING_RE.match(text):
+            found.append(text)
+        elif found and text and line.startswith("  ") and not line.startswith("   "):
+            found[-1] += " " + text  # next line of a multi-line message (source code lines are indented 4)
+    return list(dict.fromkeys(found))  # drop duplicates, keep order
 
 
 def run_tests(repo_dir, label, work):
