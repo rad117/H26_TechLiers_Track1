@@ -1,6 +1,6 @@
 # depexit: team status
 
-**Last updated:** 15 Oct, 13:21, by Radhesh. Update your own row when something changes.
+**Last updated:** 15 Oct, 15:10, by Radhesh. Update your own row when something changes.
 
 ## End goal
 
@@ -26,81 +26,63 @@ That honesty (AI claims shown separately from tested evidence) is our pitch. Eve
 
 - **15 Oct, 13:40: what "pass" means (option A, raised by Sheersh, agreed).** A migration passes if it **installs and
   no test that passed before fails after it** (verdict `improved` or `same`). Tests that already fail on the original
-  dependencies (like `test_report` because of Jinja2) don't count against other migrations. Before this, click was
-  graded "wrong" only because of that unrelated failure.
-  - Sheersh: in `compare.py`, `actual_outcome = "pass" if verdict in ("improved", "same") else "fail"`
-  - Sohan: reword the `predicted_outcome` line in the `gemma.py` prompt to ask the same question, update
-    `actual_outcome` in `CONTRACT.md`, and **delete `capsule_out/ai/`** so Gemma answers the new question
-  - Radhesh: ✅ the report and capsule.md now say **safe / broke N** and define "safe" on the page
+  dependencies (like `test_report` because of Jinja2) don't count against other migrations. ✅ Done by everyone:
+  `compare.py`, the `gemma.py` prompt, the report and the capsules all use this definition.
+- **15 Oct, 15:05: no blast radius graph.** Feature freeze is 3:15. The ledger, test grid and table already tell the
+  story, and the brief says a finished table beats an unfinished graph.
 
 ## Where each piece is
 
-| Piece | Owner | Status | Notes |
-|---|---|---|---|
-| `deps.py`: read requirements.txt and pyproject.toml | Sohan | ✅ pushed | |
-| `scan.py`: find imports | Sohan | ✅ pushed | |
-| `pypi.py`: health score | Sohan | ✅ pushed | |
-| `gemma.py`: Gemma 4 analysis | Sohan | ✅ pushed | Has a model fallback, so the report must show which model actually answered (Radhesh is on it) |
-| `runner.py`: `run_tests` and `apply_migration` | Sheersh | ✅ pushed | Commands are recorded relative to the repo, so `replay.ps1` works on any machine 👍 |
-| `compare.py`: `compare` and `scorecard` | Sheersh | ⛔ **not started (stub)** | **Blocks every end-to-end run**: `__main__.py` always calls `scorecard()` |
-| `capsule.py`: capsule files and `replay.ps1` | Radhesh | ✅ pushed, 7 tests passing | |
-| `report.html`: Blast Radius page | Radhesh | ✅ ledger, test grid, table, drawer | Next: blast radius graph, `badge.svg` |
-| README (7 sections) | Radhesh + Leena | ⏳ starts 3:00 | Needs inputs, see below |
-| `docs/model.md`, `docs/references.md`, slides | Leena | ❓ unknown | Leena, please update this row |
+| Piece | Owner | Status |
+|---|---|---|
+| `deps.py`, `scan.py`, `pypi.py` | Sohan | ✅ done |
+| `gemma.py` | Sohan | ✅ done, prompt matches decision A, offline tests |
+| `runner.py` | Sheersh | ✅ works in the real run, but **3 of its tests fail on Windows** (fixes below) |
+| `compare.py` | Sheersh | ✅ done, decision A, flags patches that edit tests |
+| `capsule.py` + `report.html` | Radhesh | ✅ done, 10 tests. Fixed: `patch.diff` was corrupted on Windows (`\r\n` → `\r\r\n`), which would have broken `replay.ps1` |
+| `README.md` (7 sections) | Radhesh | ✅ drafted. Has `TODO` comments for Sohan, Sheersh and Leena (search the file for `TODO(`) |
+| **Full run with Gemma** | **Sohan** | ❌ **not done yet: the most important thing left** |
+| `example_output/` + report screenshot | Radhesh | ❌ needs the full run first |
+| `docs/model.md`, `docs/references.md`, slides | Leena | ❌ nothing pushed, **0 commits** |
 
-## Verified integration check (13:15)
+## Verified: real end-to-end run without Gemma (15:02)
 
-Radhesh ran Sohan's real `deps` → `scan` → `pypi` on a fresh clone of rishrek/LinkWatch and passed the result into
-`capsule.write_all`. **It worked with no errors.** This ran without the baseline tests and without Gemma, so the scores
-below are missing the `fails_in_baseline` and `deprecation_warning` penalties.
+`python -m depexit analyze https://github.com/rishrek/LinkWatch --no-ai` ran **cleanly in 54 s** on Radhesh's
+machine:
+- Baseline reproduced exactly: **9 passed, 1 failed** (`soft_unicode`), plus the `pkg_resources` warning
+- **7 at risk:** Jinja2, pydantic, idna, chardet, toml, appdirs, setuptools
+- All capsule files written, 23 evidence files fingerprinted, `replay.ps1` pins commit `f52f393`
 
-| At risk (health < 70) | Health |
-|---|---|
-| pydantic | 40 |
-| idna | 45 |
-| Jinja2 | 55 (drops to 25 once the baseline failure counts) |
-| chardet | 55 |
-| toml | 60 |
-| appdirs | 60 |
-| setuptools | 75 now, should drop to 60 with the `pkg_resources` warning from the baseline |
+## What we need, from whom (in order)
 
-That's **about 7 migrations**, roughly 20 s of tests each plus the Gemma calls. Use `--max-deps 3` for fast test runs.
-`chardet` wasn't on our original list. Sohan, check whether that's intended.
-
-## What we need, from whom
-
-- **Sheersh:** `compare.py`, as soon as possible. It's the only thing between us and the 2:15 end-to-end run. Then
-  send Radhesh the **"How we verify"** paragraph (5–8 lines) for the README.
-- **Sohan:** send Radhesh **3 lines** for the README: the exact model id, how the prompt works, and what Gemma is
-  and isn't trusted for. Run the first end-to-end at 2:15 once `compare.py` lands.
-- **Leena:** `docs/model.md` (model id, version, licence link, release date) and `docs/references.md` (official
-  migration sources). Did the organisers answer the "free Gemini API tier" question? Please post the answer here.
-- **Radhesh:** blast radius graph, show the actual model per dependency in the report, `badge.svg`, then the README
-  from 3:00.
-
-## See the report right now (sample data, not a real run)
-
-```powershell
-.venv\Scripts\python.exe -m depexit.capsule team/sample_data/results.sample.json capsule_dev
-start capsule_dev\report.html
-```
-
-A red banner marks it as sample data. **Never screenshot or demo this one.** The demo uses a real run.
+1. **Sohan (now):** do the full run with Gemma and send Radhesh the `capsule_out` folder (zip it, or push it to
+   `example_output/` yourself without `_work/` except `_work/logs/`). If it's slow, use `--max-deps 4`.
+   Then fill `TODO(Sohan)` in the README: confirm the model ids, plus anything that went wrong (limitations).
+2. **Sheersh:** fix the 3 Windows test failures (both are in the tests/helpers, the real run works):
+   - `runner.relative()`: also strip the repo path followed by `/`:
+     `text.replace(str(repo_dir) + os.sep, "").replace(str(repo_dir) + "/", "")`
+     (your tests build paths like `f"{tmp_path}/.venv/x.py"`; on Windows `os.sep` is `\`)
+   - `test_runner.py` line 64: write the patch as bytes:
+     `(tmp_path / "patch.diff").write_bytes(diff.encode("utf-8"))`. `write_text` on Windows turns `\r\n` into
+     `\r\r\n`, so `git apply` rejects it. (Radhesh hit the same bug in `capsule.py`.)
+   - Then check the README's "How we verify" section (`TODO(Sheersh)`), and edit it if you want.
+3. **Leena:** push `docs/model.md` (Gemma 4 licence name and link), fill `TODO(Leena)` in the README, and make the
+   deck from `PRODUCT_AND_SLIDES.md`. **You need at least one commit**: the GitHub web editor is fine.
+4. **Radhesh:** commit `example_output/`, add the report screenshot to the README, fill the result numbers in
+   `PRODUCT_AND_SLIDES.md`, record the demo at 3:45, final checks at 4:15, submit by 4:30.
 
 ## Checkpoints
 
 | Time | Checkpoint | State |
 |---|---|---|
-| 1:00 | Lunch sync | ✅ |
-| **2:15** | **First end-to-end run** (`--no-ai --no-tests`, then a full run with `--max-deps 3`) | waiting on `compare.py` |
+| 2:15 | First end-to-end run | ✅ 15:02 without Gemma; **the full run with Gemma is still pending** |
 | 3:15 | Feature freeze: bug fixes only after this | |
 | 3:45 | Screen-record the full run and the report | |
-| 4:00 | README done, real run committed to `example_output/` | |
-| 4:15 | Final checks: repo public ✅ and renamed ✅, no `AIza` in history, LICENSE present, everyone has commits | |
+| 4:00 | README done, real run committed to `example_output/` | README drafted ✅ |
+| 4:15 | Final checks: repo public ✅ and renamed ✅, no `AIza` in history, LICENSE present ✅, everyone has commits | |
 | 4:30 | **Submit** (Radhesh) | |
 
-**Commits so far:** Radhesh 6 · Sohan 4 · Sheersh 2 · Leena 0. Everyone needs at least 6, and Leena needs at least one
-(the GitHub web editor is fine).
+**Commits so far:** Radhesh 10 · Sohan 7 · Sheersh 6 · Leena 0.
 
-**Repo:** renamed to `rad117/H26_TechLiers_Track1`. The old URL still redirects, but to update your clone run
+**Repo:** `rad117/H26_TechLiers_Track1`. If your clone still uses the old URL:
 `git remote set-url origin https://github.com/rad117/H26_TechLiers_Track1.git`.
