@@ -19,6 +19,20 @@ and see, in 5 seconds:
 
 That honesty (AI claims shown separately from tested evidence) is our pitch. Everything below serves it.
 
+**The full product description, the slide-by-slide content, the demo script and likely judge questions are in
+[PRODUCT_AND_SLIDES.md](PRODUCT_AND_SLIDES.md).** Leena: build the deck from that.
+
+## Decisions
+
+- **15 Oct, 13:40: what "pass" means (option A, raised by Sheersh, agreed).** A migration passes if it **installs and
+  no test that passed before fails after it** (verdict `improved` or `same`). Tests that already fail on the original
+  dependencies (like `test_report` because of Jinja2) don't count against other migrations. Before this, click was
+  graded "wrong" only because of that unrelated failure.
+  - Sheersh: in `compare.py`, `actual_outcome = "pass" if verdict in ("improved", "same") else "fail"`
+  - Sohan: reword the `predicted_outcome` line in the `gemma.py` prompt to ask the same question, update
+    `actual_outcome` in `CONTRACT.md`, and **delete `capsule_out/ai/`** so Gemma answers the new question
+  - Radhesh: ✅ the report and capsule.md now say **safe / broke N** and define "safe" on the page
+
 ## Where each piece is
 
 | Piece | Owner | Status | Notes |
