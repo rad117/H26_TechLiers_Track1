@@ -247,6 +247,52 @@ def analyze(record, repo, out):
     return result
 
 
+# ---------- second opinion (opt-in: python -m depexit analyze ... --review) ----------
+
+REVIEW_INSTRUCTIONS = """You are a skeptical code reviewer. A dependency migration was applied to a project and the
+project's own tests were run before and after. The test numbers below are MEASURED FACTS, not guesses.
+Passing tests only prove what the tests cover. Using the patch and the places the dependency is used, say what
+the tests may NOT have checked.
+
+Reply with ONLY one JSON object (no markdown fences):
+{
+  "agree_with_verdict": true | false,
+  "tests_may_have_missed": ["up to 3 concrete behaviours the passing tests probably do not cover"],
+  "manual_checks": ["up to 3 specific things a maintainer should check by hand or with a new test"],
+  "residual_risk": "low" | "medium" | "high"
+}
+Be specific to this patch (name files, functions, platforms). Do not repeat that tests passed."""
+
+
+def review(record, ai, patch, baseline, run, comparison):
+    """AI second opinion on a TESTED migration. Everything it says is AI-suggested; never raises."""
+    brief = {
+        "dependency": record["name"], "migration": ai.get("migration_type"),
+        "verdict_measured": comparison.get("verdict"),
+        "baseline": {k: baseline.get(k) for k in ("tests", "passed", "failed")},
+        "after_patch": {k: run.get(k) for k in ("tests", "passed", "failed", "stage")},
+        "tests_failing_after": list((run.get("failing_tests") or {}).keys()),
+        "usages": [f"{u['file']}:{u['line']} {u.get('code', '')}" for u in record.get("usages", [])],
+    }
+    prompt = "\n\n".join([
+        REVIEW_INSTRUCTIONS,
+        "## Measured facts (JSON)\n" + json.dumps(brief, indent=2),
+        "## The patch that was tested\n```diff\n" + (patch or "")[:6000] + "\n```",
+    ])
+    try:
+        raw, used = ask(prompt)
+        data = extract_json(raw)
+        as_list = lambda v: [str(x)[:300] for x in v][:3] if isinstance(v, list) else []  # noqa: E731
+        return {"source": "gemma", "model": used, "ok": True,
+                "agree_with_verdict": bool(data.get("agree_with_verdict")),
+                "tests_may_have_missed": as_list(data.get("tests_may_have_missed")),
+                "manual_checks": as_list(data.get("manual_checks")),
+                "residual_risk": data.get("residual_risk") if data.get("residual_risk") in ("low", "medium", "high") else "medium",
+                "raw": raw}
+    except Exception as exc:  # JSON problems, network, quota: the review is optional, never fatal
+        return {"source": "gemma", "ok": False, "error": f"{type(exc).__name__}: {str(exc)[:200]}"}
+
+
 if __name__ == "__main__":
     import sys
 

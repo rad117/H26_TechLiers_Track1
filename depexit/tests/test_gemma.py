@@ -85,3 +85,21 @@ def test_analyze_never_raises_when_the_model_fails(tmp_path, monkeypatch):
     monkeypatch.setattr(gemma, "ask", boom)
     result = gemma.analyze(RECORD, fake_repo(tmp_path / "repo"), tmp_path / "out")
     assert result["ok"] is False and "quota exceeded" in result["error"]
+
+
+def test_review_returns_ai_labelled_result_and_never_raises(monkeypatch):
+    brief_args = (RECORD, {"migration_type": "bump"}, "--- a/x\n+++ b/x\n", {"tests": 10, "passed": 9, "failed": 1},
+                  {"tests": 10, "passed": 10, "failed": 0, "stage": "tests"}, {"verdict": "improved"})
+    reply = json.dumps({"agree_with_verdict": True, "tests_may_have_missed": ["a", "b", "c", "d"],
+                        "manual_checks": ["check the Windows cache path"], "residual_risk": "bogus"})
+    monkeypatch.setattr(gemma, "ask", lambda prompt: (reply, "test-model"))
+    out = gemma.review(*brief_args)
+    assert out["ok"] and out["source"] == "gemma" and out["model"] == "test-model"
+    assert len(out["tests_may_have_missed"]) == 3  # capped at 3
+    assert out["residual_risk"] == "medium"  # an invalid label falls back to a safe default
+
+    def boom(prompt):
+        raise RuntimeError("quota")
+
+    monkeypatch.setattr(gemma, "ask", boom)
+    assert gemma.review(*brief_args)["ok"] is False

@@ -98,6 +98,15 @@ def analyze(args):
             result["run"] = runner.run_tests(candidate, name, work)
             result["comparison"] = compare.compare(baseline, result["run"], result["ai"])
             log(f"[{name}] verdict={result['comparison']['verdict']}")
+            if args.review:
+                log(f"[{name}] asking Gemma for a second opinion on the tested migration")
+                result["review"] = gemma.review(record, result["ai"], result["patch"], baseline,
+                                                result["run"], result["comparison"])
+                if result["review"].get("ok"):  # shown in the capsule's AI section (suggested tests)
+                    review = result["review"]
+                    notes = [f"[second opinion, residual risk {review['residual_risk']}] {c}"
+                             for c in review["manual_checks"] + review["tests_may_have_missed"]]
+                    result["ai"]["suggested_tests"] = list(result["ai"].get("suggested_tests") or []) + notes
         results.append(result)
 
     card = compare.scorecard(results)
@@ -124,6 +133,8 @@ def main(argv=None):
     a.add_argument("--only", nargs="*", metavar="PKG", help="only migrate these dependencies")
     a.add_argument("--max-deps", type=int, help="migrate at most N riskiest dependencies")
     a.add_argument("--no-ai", action="store_true", help="skip Gemma (facts only)")
+    a.add_argument("--review", action="store_true",
+                   help="after testing, ask Gemma for a second opinion on what the tests may have missed (AI-suggested)")
     a.add_argument("--no-tests", action="store_true", help="skip creating venvs and running tests")
     args = parser.parse_args(argv)
     if args.command == "analyze":
