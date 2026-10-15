@@ -1,0 +1,3 @@
+# Evidence files are stored byte for byte: summary.json holds their sha256 fingerprints,
+# and line-ending conversion (core.autocrlf) would change the bytes and break the check.
+example_output/** -text

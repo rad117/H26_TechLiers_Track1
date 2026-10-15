@@ -38,7 +38,7 @@
       ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
       ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
     ],
-    "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\baseline.log"
+    "log_file": "_work/logs/baseline.log"
   },
   "records": [
     {
@@ -791,7 +791,7 @@
           ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
           ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
         ],
-        "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\Jinja2.log"
+        "log_file": "_work/logs/Jinja2.log"
       },
       "comparison": {
         "verdict": "improved",
@@ -921,7 +921,7 @@
           ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
           ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
         ],
-        "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\pydantic.log"
+        "log_file": "_work/logs/pydantic.log"
       },
       "comparison": {
         "verdict": "same",
@@ -1033,7 +1033,7 @@
           ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
           ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
         ],
-        "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\idna.log"
+        "log_file": "_work/logs/idna.log"
       },
       "comparison": {
         "verdict": "same",
@@ -1159,7 +1159,7 @@
           ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
           ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
         ],
-        "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\chardet.log"
+        "log_file": "_work/logs/chardet.log"
       },
       "comparison": {
         "verdict": "same",
@@ -1280,7 +1280,7 @@
           ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
           ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
         ],
-        "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\toml.log"
+        "log_file": "_work/logs/toml.log"
       },
       "comparison": {
         "verdict": "same",
@@ -1408,7 +1408,7 @@
           ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
           ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
         ],
-        "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\appdirs.log"
+        "log_file": "_work/logs/appdirs.log"
       },
       "comparison": {
         "verdict": "same",
@@ -1528,7 +1528,7 @@
           ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
           ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
         ],
-        "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\setuptools.log"
+        "log_file": "_work/logs/setuptools.log"
       },
       "comparison": {
         "verdict": "improved",
@@ -1549,28 +1549,28 @@
     }
   ],
   "evidence": {
-    "appdirs/capsule.json": "44d38b4b51d1895cd133b919e6e43d1c82df3d18404374dc8f1ba5b8a3f519ad",
+    "appdirs/capsule.json": "bcc7fcb27baae765f6d1a10016941d9a900abbfe2d3974ccf539277fce9f68f0",
     "appdirs/capsule.md": "b529c408c57fb20c6d6e83932549dc0049caa0b12dc1891998fbe7a73f6e9814",
     "appdirs/patch.diff": "008023a4091063f2a8eba33d21a1b9adffae05f0008b577e9d420c37d6a54380",
-    "chardet/capsule.json": "9d46c13ff6cdc51c6e84b09be2c76597d963907b6699f3739173d85806a45b07",
+    "chardet/capsule.json": "b73a17655492896390ba0b4797c9f5930eac7b249ce9d2ca51274449fdf4e84a",
     "chardet/capsule.md": "7029dbc8f63067b2a102fe383bd1c8dad1a53932c207cd679fe0630714528e20",
     "chardet/patch.diff": "7ebe8deb5b4949ef633444ee42c911cf6c36c14917ffc4b26071fb5e05fa1fdf",
-    "idna/capsule.json": "1ce869baaa7eb325f1ac62bcdff959d62c4f52094ff334a8ec1aca65dbabc43d",
+    "idna/capsule.json": "9b1f21530a769cc5bf7c727d8c3211f7f430b59065fa361a6b779ce54680653b",
     "idna/capsule.md": "ba9ab886304ef7f611eec7dd5c04f1bbc292d82fcd1be39e702b52706d213280",
     "idna/patch.diff": "dfd818e777ba22e2aa598c88b8c0f7e9dd90bef32475b11b74d931b5816721ac",
-    "Jinja2/capsule.json": "1263466820f0890a9b8355c0eebaffea6ac053a4640910d5cecece64c34064b4",
+    "Jinja2/capsule.json": "372038b680f9088dbc276fa4106662a718cbde0c6d6a37e59fc59594208e4a5b",
     "Jinja2/capsule.md": "c19969aed10b4cdf388ca2ed71951b4ef49a1c0955c3d807c728f9d70b69fa83",
     "Jinja2/patch.diff": "5ae3398a22e8eb94e97aec6e30d9d4b7285c63aec2e2a9fef0f07d64e6e5e301",
-    "pydantic/capsule.json": "588fdcf34cc2452c3a935068e71611e37583c889b8215eff103efc041df24b46",
+    "pydantic/capsule.json": "fc629c53be1654a8a1ff3678baeab2c131138fc76de738199f9a3722eb9bf448",
     "pydantic/capsule.md": "28e5d5b3b5f04854c1f087183d0ec026930c656997df5874881df84d13bb7bc4",
     "pydantic/patch.diff": "63b71593e969caab1ed6faacde059c71c2dd95e3706c1a5af50ab3e7e6532b54",
-    "setuptools/capsule.json": "fefd0d5d1d83c7eae857053e5f9b8037c6c492e6a3e127df0b0e25033128cb8b",
+    "setuptools/capsule.json": "d4cc4f0324701e6954aa20b3adf8582e14b012a07d938018bbe8b62ba2a1bab7",
     "setuptools/capsule.md": "fed2349a9814c9501c115509c1ed2b0981b8e59577230677debbe6fecea21da2",
     "setuptools/patch.diff": "bb096b99d738f4e378e66c6aa3018fcb4195de48f293645c3099773eb8527de4",
-    "toml/capsule.json": "bd9bc5d11cf893dc38ffdb9de766e436331dc2b7a3e5c60ddd6b528afee0a278",
+    "toml/capsule.json": "dcd3110d18b882b207b212ef4d157fe1dd304ec9c68ea8fcfe97ee7e89f00445",
     "toml/capsule.md": "dfdfd2270f6d97561898ec59f728d3c2692cde325f926852c4340ea51be2a825",
     "toml/patch.diff": "44e59dc017288090a59fc802f3baf6ac34092c11b3d248a42bd5bdf5db1ee2a8",
-    "replay.ps1": "3daeb13412ac4967d844eb09d4e66a3491c74cf0558f055f2a18ea683f4fb9ac",
+    "replay.ps1": "75fc9cc9c47003c9b4a472554d24803278f7a2baea3499d20064dbf50ff9fa75",
     "_work/logs/baseline.log": "2e5eb8f7ade2af66d56e325cfa6689d2893ee9970675f992d11ff91e7c6e6e35",
     "_work/logs/Jinja2.log": "73b00f0a8bfaad4e611268319b02688035267639399f573772cd8a3c1d29a5d0",
     "_work/logs/pydantic.log": "a2b0dc4a703c08aa42e9387194f623d18a9c9b3a4d020a26fdb7271f3a1618e3",

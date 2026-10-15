@@ -18,7 +18,7 @@ Pop-Location
 $dir = Join-Path $root 'Jinja2'
 git clone -q https://github.com/rishrek/LinkWatch $dir
 git -C $dir checkout -q f52f3930c8e7c33d934ccf614955a38e26984bd5
-git -C $dir apply (Join-Path $capsule 'Jinja2/patch.diff')
+git -C $dir apply --ignore-whitespace (Join-Path $capsule 'Jinja2/patch.diff')
 Push-Location $dir
 py -3.12 -m venv --clear .venv
 & .venv\Scripts\python.exe -m pip install -r requirements.txt pytest
@@ -29,7 +29,7 @@ Pop-Location
 $dir = Join-Path $root 'pydantic'
 git clone -q https://github.com/rishrek/LinkWatch $dir
 git -C $dir checkout -q f52f3930c8e7c33d934ccf614955a38e26984bd5
-git -C $dir apply (Join-Path $capsule 'pydantic/patch.diff')
+git -C $dir apply --ignore-whitespace (Join-Path $capsule 'pydantic/patch.diff')
 Push-Location $dir
 py -3.12 -m venv --clear .venv
 & .venv\Scripts\python.exe -m pip install -r requirements.txt pytest
@@ -40,7 +40,7 @@ Pop-Location
 $dir = Join-Path $root 'idna'
 git clone -q https://github.com/rishrek/LinkWatch $dir
 git -C $dir checkout -q f52f3930c8e7c33d934ccf614955a38e26984bd5
-git -C $dir apply (Join-Path $capsule 'idna/patch.diff')
+git -C $dir apply --ignore-whitespace (Join-Path $capsule 'idna/patch.diff')
 Push-Location $dir
 py -3.12 -m venv --clear .venv
 & .venv\Scripts\python.exe -m pip install -r requirements.txt pytest
@@ -51,7 +51,7 @@ Pop-Location
 $dir = Join-Path $root 'chardet'
 git clone -q https://github.com/rishrek/LinkWatch $dir
 git -C $dir checkout -q f52f3930c8e7c33d934ccf614955a38e26984bd5
-git -C $dir apply (Join-Path $capsule 'chardet/patch.diff')
+git -C $dir apply --ignore-whitespace (Join-Path $capsule 'chardet/patch.diff')
 Push-Location $dir
 py -3.12 -m venv --clear .venv
 & .venv\Scripts\python.exe -m pip install -r requirements.txt pytest
@@ -62,7 +62,7 @@ Pop-Location
 $dir = Join-Path $root 'toml'
 git clone -q https://github.com/rishrek/LinkWatch $dir
 git -C $dir checkout -q f52f3930c8e7c33d934ccf614955a38e26984bd5
-git -C $dir apply (Join-Path $capsule 'toml/patch.diff')
+git -C $dir apply --ignore-whitespace (Join-Path $capsule 'toml/patch.diff')
 Push-Location $dir
 py -3.12 -m venv --clear .venv
 & .venv\Scripts\python.exe -m pip install -r requirements.txt pytest
@@ -73,7 +73,7 @@ Pop-Location
 $dir = Join-Path $root 'appdirs'
 git clone -q https://github.com/rishrek/LinkWatch $dir
 git -C $dir checkout -q f52f3930c8e7c33d934ccf614955a38e26984bd5
-git -C $dir apply (Join-Path $capsule 'appdirs/patch.diff')
+git -C $dir apply --ignore-whitespace (Join-Path $capsule 'appdirs/patch.diff')
 Push-Location $dir
 py -3.12 -m venv --clear .venv
 & .venv\Scripts\python.exe -m pip install -r requirements.txt pytest
@@ -84,7 +84,7 @@ Pop-Location
 $dir = Join-Path $root 'setuptools'
 git clone -q https://github.com/rishrek/LinkWatch $dir
 git -C $dir checkout -q f52f3930c8e7c33d934ccf614955a38e26984bd5
-git -C $dir apply (Join-Path $capsule 'setuptools/patch.diff')
+git -C $dir apply --ignore-whitespace (Join-Path $capsule 'setuptools/patch.diff')
 Push-Location $dir
 py -3.12 -m venv --clear .venv
 & .venv\Scripts\python.exe -m pip install -r requirements.txt pytest

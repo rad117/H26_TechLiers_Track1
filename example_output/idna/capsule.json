@@ -93,7 +93,7 @@
       ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
       ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
     ],
-    "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\idna.log"
+    "log_file": "_work/logs/idna.log"
   },
   "comparison": {
     "verdict": "same",
