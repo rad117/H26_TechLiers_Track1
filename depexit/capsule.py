@@ -33,7 +33,8 @@ def write_all(out, meta, records, results, baseline, card):
         folder.mkdir(exist_ok=True)
         write_json(folder / "capsule.json", {**result, "dep": dep})
         (folder / "capsule.md").write_text(capsule_md(meta, dep, result, baseline), encoding="utf-8")
-        (folder / "patch.diff").write_text(result.get("patch") or "", encoding="utf-8")
+        # bytes, not text mode: Windows text mode turns \r\n into \r\r\n and then `git apply` rejects the patch
+        (folder / "patch.diff").write_bytes((result.get("patch") or "").encode("utf-8"))
 
     paths = {"replay": write_replay(out, meta, results, baseline)}
     summary = {"meta": meta, "scorecard": card, "baseline": baseline, "records": records,
@@ -180,9 +181,11 @@ def concerns(dep, ai, run, cmp):
             out.append("Gemma predicted the change would break something, but no test that passed before failed.")
         elif run and run["stage"] != "tests":
             out.append("Gemma predicted the change was safe, but it could not even be installed.")
-        else:
-            out.append(f"Gemma predicted the change was safe, but it broke {len(cmp.get('newly_failing') or [])} "
+        elif cmp.get("newly_failing"):
+            out.append(f"Gemma predicted the change was safe, but it broke {len(cmp['newly_failing'])} "
                        "test(s) that passed before.")
+        else:  # regressed without a newly failing test, e.g. some tests no longer ran at all
+            out.append(f"Gemma predicted the change was safe, but: {(cmp.get('gaps') or ['it regressed'])[0]}")
     if cmp and cmp.get("still_failing"):
         out.append(f"{len(cmp['still_failing'])} test(s) still fail after this change (may be unrelated to it).")
     changed = {c["name"].lower() for c in (ai or {}).get("requirement_changes") or []}

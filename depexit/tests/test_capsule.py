@@ -38,6 +38,23 @@ def test_wrong_prediction_is_explained_in_safe_broke_terms(tmp_path):
     assert "Gemma predicted the change was safe, but it broke 1 test(s) that passed before." in md
 
 
+def test_regression_without_newly_failing_test_quotes_the_gap():
+    cmp = {"verdict": "regressed", "predicted_outcome": "pass", "actual_outcome": "fail", "prediction_correct": False,
+           "newly_failing": [], "still_failing": [], "gaps": ["3 of the original 10 tests no longer ran"]}
+    run = {"stage": "tests"}
+    lines = capsule.concerns({"name": "x"}, {"ok": True}, run, cmp)
+    assert "Gemma predicted the change was safe, but: 3 of the original 10 tests no longer ran" in lines
+
+
+def test_patch_bytes_are_written_exactly(tmp_path):
+    # Windows clones have \r\n line endings; text mode would turn them into \r\r\n and `git apply` (replay.ps1) fails
+    patch = "--- a/requirements.txt\r\n+++ b/requirements.txt\r\n@@ -1 +1 @@\r\n-Jinja2==2.11.3\r\n+Jinja2>=3.1,<4\n"
+    record = {"name": "Jinja2", "status": "declared", "specs": {}, "usages": [], "signals": [], "health_score": 25}
+    result = {"dep": record, "ai": None, "patch": patch, "run": None, "comparison": None}
+    capsule.write_all(tmp_path, {"target": "x"}, [record], [result], None, {"total": 0, "correct": 0, "wrong": []})
+    assert (tmp_path / "Jinja2" / "patch.diff").read_bytes() == patch.encode("utf-8")
+
+
 def test_failed_ai_is_reported_not_crashed(tmp_path):
     write_sample(tmp_path)
     md = (tmp_path / "appdirs" / "capsule.md").read_text(encoding="utf-8")
