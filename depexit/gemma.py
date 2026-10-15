@@ -190,13 +190,17 @@ def ask(prompt):
 
     last = None
     for model in candidate_models():
-        for attempt in range(1):
+        for attempt in range(2):
             try:
                 # No generation config: gemma-4-31b-it returned HTTP 500 whenever `temperature` was set.
                 reply = get_client().models.generate_content(model=model, contents=prompt)
                 return reply.text or "", model
-            except (errors.ServerError, httpx.TransportError) as exc:  # 500/503 or timeout: next model
+            except errors.ServerError as exc:  # 500/503 answer fast and are often transient: retry once
                 last = exc
+                time.sleep(4)
+            except httpx.TransportError as exc:  # a timeout already cost minutes: go to the next model
+                last = exc
+                break
             except errors.ClientError as exc:
                 if exc.code != 429:  # bad key / bad request: another attempt won't help
                     raise
