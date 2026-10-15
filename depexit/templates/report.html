@@ -63,6 +63,21 @@
   .grade.right { color: var(--good); } .grade.wrong { color: var(--bad); } .grade.na { color: var(--muted); font-weight: 400; }
   .why { grid-column: 2 / -1; color: var(--bad); font-size: 13px; margin-top: -.4rem; }
 
+  /* test evidence grid: solid cells, because every one is an observed test result */
+  .gridwrap { padding: .4rem; }
+  table.grid { border-collapse: separate; border-spacing: 5px; min-width: 0; width: auto; }
+  .grid th { border: 0; padding: .3rem .4rem; vertical-align: bottom; }
+  .grid th.test { font: 13px var(--code); color: var(--ink); text-align: right; padding-right: .8rem; white-space: nowrap; }
+  .grid th button { background: none; border: 0; padding: 0; cursor: pointer; font: 600 .95rem var(--display);
+                    text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: 4px; }
+  .cell { min-width: 5.6rem; text-align: center; border-radius: 4px; padding: .45rem .6rem; border: 0;
+          font: 600 .9rem var(--display); color: #fff; }
+  .cell.pass { background: var(--good); } .cell.fail { background: var(--bad); }
+  .cell.same { opacity: .35; }
+  .cell.changed { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink); }
+  .cell.blocked { background: repeating-linear-gradient(135deg, #D5DCE2 0 4px, #EEF2F5 4px 8px); color: var(--muted); }
+  .cell.rest { background: none; color: var(--muted); font-weight: 400; }
+
   /* dependency table */
   .tablewrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; }
   table { border-collapse: collapse; width: 100%; min-width: 720px; }
@@ -128,6 +143,12 @@
     <span><i class="swatch fact"></i>Solid: what the tests showed</span>
   </div>
   <ul class="ledger" id="ledger"></ul>
+
+  <section id="grid-section" hidden>
+    <h2>What each fix did to the tests</h2>
+    <p class="lede">Each column is a real test run. Bright cells changed compared with the original run; faded cells stayed the same. Hover a red cell to read the error.</p>
+    <div class="tablewrap gridwrap"><table class="grid" id="grid"></table></div>
+  </section>
 
   <h2>Every dependency, riskiest first</h2>
   <div class="tablewrap">
@@ -204,6 +225,48 @@ for (const r of DATA.results || []) {
     why[name] ? el("div", {class: "why"}, why[name]) : null));
 }
 if (!(DATA.results || []).length) $("ledger").append(el("li", {}, el("span", {class: "muted"}, "No dependency was at risk, so nothing was migrated.")));
+
+// ---------- test evidence grid ----------
+// Rows: every test that failed in at least one run. Columns: the original run, then each tested fix.
+// A test counts as failing if the run's failure list OR Sheersh's comparison says so (never overclaim a fix).
+function failingIn(col) {
+  if (!col.run || col.run.stage !== "tests") return null;   // null = the tests never ran
+  const fails = {...(col.run.failing_tests || {})};
+  for (const id of [...(col.cmp?.still_failing || []), ...(col.cmp?.newly_failing || [])]) fails[id] ??= "failed (from comparison)";
+  return fails;
+}
+const baseCol = {label: "Original", run: base};
+const columns = [baseCol, ...(DATA.results || []).filter((r) => r.run)
+  .map((r) => ({label: r.dep.name, run: r.run, cmp: r.comparison, dep: r.dep.name}))];
+const testIds = [...new Set(columns.flatMap((c) => Object.keys(failingIn(c) || {})))].sort();
+
+function gridCell(col, id) {
+  const fails = failingIn(col);
+  if (fails === null) return el("td", {class: "cell blocked", title: `install blocked at ${col.run.stage}`}, "blocked");
+  const failed = id in fails, failedBefore = id in (failingIn(baseCol) || {});
+  const changed = col.dep && failed !== failedBefore;
+  const word = changed ? (failed ? "broke" : "fixed") : failed ? "fail" : "pass";
+  const cls = `cell ${failed ? "fail" : "pass"} ${col.dep ? (changed ? "changed" : "same") : ""}`;
+  return el("td", {class: cls, title: failed ? fails[id] : "passed"}, word);
+}
+
+if (base && base.stage === "tests" && testIds.length) {
+  const grid = $("grid");
+  grid.append(el("thead", {}, el("tr", {}, el("th", {}),
+    columns.map((c) => el("th", {}, c.dep ? el("button", {onclick: () => openPanel(c.dep)}, c.dep) : c.label)))));
+  const body = el("tbody", {}, testIds.map((id) =>
+    el("tr", {}, el("th", {class: "test", title: id}, id.replace(/^tests\//, "")), columns.map((c) => gridCell(c, id)))));
+  // Tests that never failed: only claim "passed everywhere" when every run collected the same number of tests
+  const others = base.tests - testIds.length;
+  if (others > 0 && columns.every((c) => !failingIn(c) || c.run.tests === base.tests))
+    body.append(el("tr", {}, el("th", {class: "test muted"}, `${others} other tests`),
+      columns.map((c) => !failingIn(c) ? el("td", {class: "cell blocked"}, "blocked")
+        // only say "pass" if the failure list accounts for every failed/errored test in that run
+        : Object.keys(failingIn(c)).length === (c.run.failed || 0) + (c.run.errors || 0) ? el("td", {class: "cell rest"}, "pass")
+        : el("td", {class: "cell rest", title: "failure list is incomplete for this run"}, "unknown"))));
+  grid.append(body);
+  $("grid-section").hidden = false;
+}
 
 // ---------- dependency table ----------
 const records = [...(DATA.records || [])].sort((a, b) => (a.health_score ?? 100) - (b.health_score ?? 100));
