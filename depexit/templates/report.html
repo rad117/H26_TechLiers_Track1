@@ -114,6 +114,33 @@
   .src { font-size: 12px; color: var(--verified); border: 1px solid var(--verified); border-radius: 4px; padding: 0 .35rem; margin-left: .3rem; }
   .runs { border-collapse: collapse; width: 100%; min-width: 0; background: var(--surface); }
   .runs td, .runs th { padding: .35rem .5rem; border-bottom: 1px solid var(--rule); }
+  /* Before / After view: everything here is observed (logs + patch), so it uses the solid "verified" frame */
+  .ba { margin-top: 1.4rem; border: 2px solid var(--verified); border-radius: 6px; padding: 1rem 1.2rem; }
+  .ba-head { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+  .ba-head h4 { margin: 0; font: 600 1.15rem var(--display); }
+  .switch { display: inline-flex; margin-left: auto; border: 2px solid var(--ink); border-radius: 999px; overflow: hidden; }
+  .switch button { border: 0; background: none; padding: .3rem 1.1rem; cursor: pointer; font: 600 .95rem var(--display); }
+  .switch button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .ba h5 { font: 600 .9rem var(--body); color: var(--muted); margin: 1rem 0 .3rem; }
+  .ba-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: .8rem; align-items: center;
+            padding: .3rem .5rem; border-radius: 4px; }
+  .ba-row.delta { box-shadow: inset 3px 0 0 var(--ink); }
+  .ba-label { font: 13px var(--code); overflow-wrap: anywhere; }
+  .ba-val { font: 600 .95rem var(--display); white-space: nowrap; }
+  .ba[data-state="before"] .v-after, .ba[data-state="after"] .v-before { display: none; }
+  .v-fail { color: var(--bad); } .v-pass { color: var(--good); } .v-none { color: var(--muted); font-weight: 400; }
+  /* motion only on rows whose value differs between Before and After */
+  .flash { animation: flash .9s ease-out; }
+  .flash .ba-val { animation: rise .3s ease-out; }
+  @keyframes flash { from { background: #FFEDB8; } to { background: transparent; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .flash, .flash .ba-val { animation: none; } }
+  .evbtn { background: none; border: 1px solid var(--ink); border-radius: 4px; padding: .1rem .5rem; cursor: pointer; font-size: 12px; }
+  .ba-evidence:not(:empty) { margin-top: 1rem; border-top: 2px solid var(--ink); padding-top: .4rem; }
+  .ba-evidence:focus { outline: none; }
+  .ev-cols { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+  @media (max-width: 600px) { .ev-cols { grid-template-columns: 1fr; } }
+  pre.tb { font-size: 11px; background: #F4F6F8; padding: .5rem; overflow: auto; max-height: 15rem; }
   pre.diff { background: #1B2530; color: #DCE3EA; padding: 1rem; border-radius: 6px; overflow-x: auto; line-height: 1.45; }
   pre.diff .add { color: #7EE2A8; } pre.diff .del { color: #FF9C8F; } pre.diff .hunk { color: #B9AEF5; }
   .concerns li { margin-bottom: .3rem; }
@@ -308,6 +335,121 @@ function diff(text) {
          : line.startsWith("-") && !line.startsWith("---") ? "del" : ""}, line + "\n")));
 }
 
+// ---------- Before / After: one switch, built only from the logs and the patch ----------
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+// does `name` (a package) appear as a whole word in `hay`? ("jinja2" in ".../site-packages/jinja2/filters.py")
+const mentions = (hay, name) => [name, name.replaceAll("-", "_")].some((n) =>
+  new RegExp(`(^|[^a-z0-9_])${escapeRe(n.toLowerCase())}([^a-z0-9_]|$)`).test(hay));
+
+function patchFiles(patch) {          // [{path, text, add, del}], one entry per file in the unified diff
+  const files = [];
+  for (const line of (patch || "").split("\n")) {
+    if (line.startsWith("--- ")) files.push({path: null, lines: [line], add: 0, del: 0});
+    else if (files.length) {
+      const f = files[files.length - 1];
+      f.lines.push(line);
+      if (line.startsWith("+++ ")) f.path = line.slice(4).trim().replace(/^b\//, "");
+      else if (line.startsWith("+")) f.add++;
+      else if (line.startsWith("-")) f.del++;
+    }
+  }
+  return files.filter((f) => f.path).map((f) => ({...f, text: f.lines.join("\n")}));
+}
+
+function baRow(label, before, after, beforeCls, afterCls, action) {
+  const changed = before !== after;
+  return el("div", {class: `ba-row${changed ? " delta" : ""}`},
+    el("span", {class: "ba-label"}, label),
+    el("span", {class: "ba-val"}, el("span", {class: `v-before ${beforeCls || ""}`}, before),
+                                  el("span", {class: `v-after ${afterCls || ""}`}, after)),
+    action || el("span"));
+}
+
+function beforeAfter(res) {
+  const run = res.run;
+  if (!base || !run) return null;
+  const logs = DATA.logs || {}, bl = logs[base.label] || {}, al = logs[run.label] || {};
+  const bfail = failingIn(baseCol) || {}, afail = failingIn({run, cmp: res.comparison}) || {};
+  const files = patchFiles(res.patch);
+  let versions = null;
+  if (bl.installed && al.installed) {
+    const names = [...new Set([...Object.keys(bl.installed), ...Object.keys(al.installed)])].sort();
+    const changed = names.filter((n) => bl.installed[n] !== al.installed[n])
+      .map((n) => ({name: n, before: bl.installed[n] || "not installed", after: al.installed[n] || "not installed"}));
+    versions = {changed, same: names.length - changed.length};
+  }
+
+  const sec = el("section", {class: "ba", "data-state": "before"});
+  const evidence = el("div", {class: "ba-evidence", tabindex: "-1"});
+  const btnB = el("button", {"aria-pressed": "true", onclick: () => setState("before")}, "Before");
+  const btnA = el("button", {"aria-pressed": "false", onclick: () => setState("after")}, "After");
+  function setState(state) {
+    if (sec.dataset.state === state) return;
+    sec.dataset.state = state;
+    btnB.setAttribute("aria-pressed", String(state === "before"));
+    btnA.setAttribute("aria-pressed", String(state === "after"));
+    for (const row of sec.querySelectorAll(".delta")) {     // re-trigger the highlight on changed rows only
+      row.classList.remove("flash"); void row.offsetWidth; row.classList.add("flash");
+    }
+  }
+
+  function evCol(label, msg, tb) {
+    return el("div", {}, el("strong", {}, label),
+      msg ? [el("p", {class: "bad"}, msg), tb ? el("pre", {class: "tb"}, tb) : null] : el("p", {class: "good"}, "passed"));
+  }
+  function showEvidence(id) {
+    const fn = id.split("::").pop();
+    const msgB = bfail[id], msgA = afail[id];
+    const tbB = (bl.tracebacks || {})[fn], tbA = (al.tracebacks || {})[fn];
+    const hay = [id, msgB, msgA, tbB, tbA].filter(Boolean).join("\n").toLowerCase().replaceAll("\\", "/");
+    const pkgs = (versions?.changed || []).filter((p) => mentions(hay, p.name));
+    const hunks = files.filter((f) => hay.includes(f.path.toLowerCase())
+                                   || pkgs.some((p) => mentions(f.text.toLowerCase(), p.name)));
+    evidence.replaceChildren(el("div", {},
+      el("h5", {}, `Evidence for ${id.replace(/^tests\//, "")}`),
+      el("div", {class: "ev-cols"}, evCol("Before", msgB, tbB), evCol("After", msgA, tbA)),
+      el("h5", {}, "What changed and is named in this test's error"),
+      pkgs.length || hunks.length
+        ? [pkgs.map((p) => el("p", {}, el("code", {}, p.name), `  ${p.before} ⇢ ${p.after}`)),
+           hunks.map((f) => [el("p", {class: "muted"}, f.path), diff(f.text)])]
+        : el("p", {class: "muted"}, "No changed package or file is named in this test's error. Every change is listed above."),
+      el("p", {class: "muted"}, "Linked because it appears in the error text, not proven to be the cause.")));
+    evidence.scrollIntoView({behavior: reduceMotion ? "auto" : "smooth", block: "start"});
+    evidence.focus({preventScroll: true});
+  }
+
+  const tests = [...new Set([...Object.keys(bfail), ...Object.keys(afail)])].sort();
+  const status = (fails, id) => (id in fails ? "fail" : "pass");
+  const warnings = [...new Set([...(base.warnings || []), ...(run.warnings || [])])];
+  sec.append(...[   // native append() doesn't flatten arrays, so flatten first
+    el("div", {class: "ba-head"}, el("h4", {}, "Before and after this migration"),
+      el("span", {class: "switch", role: "group", "aria-label": "Show the original run or the migrated run"}, btnB, btnA)),
+    el("h5", {}, "Installed packages"),
+    !versions ? el("p", {class: "muted"}, "Installed versions were not recorded (run logs not available).")
+      : [versions.changed.map((p) => baRow(p.name, p.before, p.after)),
+         el("p", {class: "muted"}, `${versions.same} other packages unchanged`)],
+    el("h5", {}, "Changed files"),
+    files.length ? files.map((f) => baRow(f.path, "original", `+${f.add} −${f.del}`, "v-none"))
+                 : el("p", {class: "muted"}, "No files changed."),
+    el("h5", {}, "Tests"),
+    run.stage !== "tests" ? baRow("test suite", "ran", `blocked at ${run.stage}`, "v-pass", "v-fail")
+      : [tests.map((id) => {
+           const b = status(bfail, id), a = status(afail, id);
+           return baRow(id.replace(/^tests\//, ""), b, a, `v-${b}`, `v-${a}`,
+             b !== a ? el("button", {class: "evbtn", onclick: () => showEvidence(id)}, "Show evidence") : null);
+         }),
+         el("p", {class: "muted"}, `${Math.max(0, base.tests - tests.length)} other tests pass in both runs`)],
+    el("h5", {}, "Warnings"),
+    warnings.length ? warnings.map((w) => {
+        const b = (base.warnings || []).includes(w), a = (run.warnings || []).includes(w);
+        return baRow(w, b ? "present" : "none", a ? "present" : "none", b ? "v-fail" : "v-none", a ? "v-fail" : "v-none");
+      })
+      : el("p", {class: "muted"}, "No warnings in either run."),
+    evidence].flat(Infinity).filter(Boolean));
+  return sec;
+}
+
 function openPanel(name) {
   const rec = recordFor[name] || resultFor[name].dep, res = resultFor[name] || {};
   const ai = res.ai, run = res.run, cmp = res.comparison, panel = $("panel");
@@ -319,6 +461,8 @@ function openPanel(name) {
       el("span", {class: `health ${healthClass(score)}`}, `${score}/100`),
       cmp ? el("span", {class: `verdict ${cmp.verdict}`}, cmp.verdict) : null,
       el("button", {class: "close", onclick: closePanel}, "Close")),
+
+    beforeAfter(res),
 
     el("section", {class: "box fact"},
       el("h4", {}, "✅ What depexit observed"),

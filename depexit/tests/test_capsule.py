@@ -48,6 +48,29 @@ def test_regression_without_newly_failing_test_quotes_the_gap():
     assert "Gemma predicted the change was safe, but: 3 of the original 10 tests no longer ran" in lines
 
 
+PIP_LOG = """$ .venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest
+Successfully installed Jinja2-3.1.6 MarkupSafe-3.0.4 python-dateutil-2.9.0.post0
+$ .venv\\Scripts\\python.exe -m pytest -q
+================================== FAILURES ===================================
+________________________ test_report_renders_all_sites ________________________
+
+.venv\\Lib\\site-packages\\jinja2\\filters.py:13: in <module>
+E   ImportError: cannot import name 'soft_unicode' from 'markupsafe'
+=========================== short test summary info ===========================
+"""
+
+
+def test_installed_versions_from_pip_and_uv_logs():
+    assert capsule.installed_versions(PIP_LOG) == {"jinja2": "3.1.6", "markupsafe": "3.0.4", "python-dateutil": "2.9.0.post0"}
+    assert capsule.installed_versions(" + jinja2==3.1.6\n + markupsafe==3.0.4\n") == {"jinja2": "3.1.6", "markupsafe": "3.0.4"}
+
+
+def test_tracebacks_by_test_name():
+    tb = capsule.tracebacks(PIP_LOG)
+    assert list(tb) == ["test_report_renders_all_sites"]
+    assert "site-packages\\jinja2\\filters.py" in tb["test_report_renders_all_sites"]
+
+
 def test_patch_bytes_are_written_exactly(tmp_path):
     # Windows clones have \r\n line endings; text mode would turn them into \r\r\n and `git apply` (replay.ps1) fails
     patch = "--- a/requirements.txt\r\n+++ b/requirements.txt\r\n@@ -1 +1 @@\r\n-Jinja2==2.11.3\r\n+Jinja2>=3.1,<4\n"

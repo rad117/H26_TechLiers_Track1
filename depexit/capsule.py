@@ -42,7 +42,8 @@ def write_all(out, meta, records, results, baseline, card):
     paths["summary"] = write_json(out / "summary.json", summary)
     concern_map = {r["dep"]["name"]: concerns(full.get(r["dep"]["name"], r["dep"]), r.get("ai"), r.get("run"), r.get("comparison"))
                    for r in results}
-    paths["report"] = write_report(out, {**summary, "concerns": concern_map})
+    paths["report"] = write_report(out, {**summary, "concerns": concern_map,
+                                         "logs": log_evidence(baseline, results)})
     return {k: str(v) for k, v in paths.items()}
 
 
@@ -193,6 +194,46 @@ def concerns(dep, ai, run, cmp):
         out.append("Only requirements.txt was changed; pyproject.toml still has the old spec.")
     out.append("A passing test suite only proves the code paths the tests actually exercise.")
     return out
+
+
+# ---------- log evidence for the report's Before/After view ----------
+
+def installed_versions(log):
+    """{package: version} actually installed, from pip ("Successfully installed A-1 B-2") or uv (" + a==1")."""
+    found = {}
+    for line in log.splitlines():
+        if line.startswith("Successfully installed "):
+            for item in line.split()[2:]:
+                name, _, version = item.rpartition("-")   # versions never contain "-", names can
+                found[name.lower()] = version
+        elif m := re.match(r"\s*\+ ([A-Za-z0-9_.-]+)==(\S+)", line):
+            found[m.group(1).lower()] = m.group(2)
+    return found
+
+
+def tracebacks(log, keep=30):
+    """{test function name: last lines of its pytest failure section}."""
+    sections, name = {}, None
+    for line in log.splitlines():
+        if m := re.match(r"_{3,} (\S+) _{3,}$", line):
+            name = m.group(1).split(".")[-1]      # "TestX.test_y" -> "test_y"
+            sections[name] = []
+        elif re.match(r"={3,} ", line):
+            name = None                            # "=== warnings summary ===" etc. ends the failures
+        elif name:
+            sections[name].append(line)
+    return {k: "\n".join(v[-keep:]).strip() for k, v in sections.items()}
+
+
+def log_evidence(baseline, results):
+    """Per run label: installed versions and failure tracebacks, read from the run logs (if still on disk)."""
+    evidence = {}
+    for run in [baseline, *[r.get("run") for r in results]]:
+        log = Path(run["log_file"]) if run and run.get("log_file") else None
+        if log and log.is_file():
+            text = log.read_text(encoding="utf-8", errors="replace")
+            evidence[run["label"]] = {"installed": installed_versions(text), "tracebacks": tracebacks(text)}
+    return evidence
 
 
 # ---------- report.html ----------
