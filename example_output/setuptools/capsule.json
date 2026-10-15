@@ -1,0 +1,122 @@
+{
+  "dep": {
+    "name": "setuptools",
+    "import_names": [
+      "_distutils_hack",
+      "pkg_resources",
+      "setuptools"
+    ],
+    "status": "declared",
+    "specs": {
+      "requirements.txt": "==75.8.0",
+      "pyproject.toml": "==75.8.0"
+    },
+    "pinned_version": "75.8.0",
+    "spec_mismatch": false,
+    "usages": [
+      {
+        "file": "linkwatch/resources.py",
+        "line": 1,
+        "code": "import pkg_resources",
+        "names": [],
+        "private": false,
+        "is_test": false
+      }
+    ],
+    "pypi": {
+      "latest": "84.0.0",
+      "latest_date": "2026-08-08",
+      "pinned_date": "2025-01-08",
+      "inactive": false,
+      "requires_python": ">=3.10"
+    },
+    "signals": [
+      {
+        "id": "deprecation_warning",
+        "detail": "linkwatch\\resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html",
+        "points": -15,
+        "source": "baseline_tests"
+      },
+      {
+        "id": "major_behind",
+        "detail": "pinned 75.8.0, latest 84.0.0",
+        "points": -25,
+        "source": "pypi"
+      }
+    ],
+    "health_score": 60,
+    "at_risk": true
+  },
+  "ai": {
+    "source": "gemma",
+    "model": "gemma-4-31b-it",
+    "ok": true,
+    "prompt_key": "9e8f2a73ac2fb577",
+    "risk_explanation": "The 'pkg_resources' module from 'setuptools' is deprecated. The 'importlib.resources' module in the standard library is the modern, recommended alternative for accessing package resources in Python 3.9+.",
+    "replacement": "importlib.resources (stdlib)",
+    "migration_type": "remove",
+    "requirement_changes": [
+      {
+        "action": "remove",
+        "name": "setuptools",
+        "line": ""
+      }
+    ],
+    "file_edits": [
+      {
+        "path": "linkwatch/resources.py",
+        "new_content": "from importlib import resources\n\nTEMPLATE_NAME = \"status.html.j2\"\n\n\ndef template_dir():\n    return str(resources.files(\"linkwatch\") / \"templates\")\n"
+      }
+    ],
+    "steps": [
+      "Remove setuptools from requirements.txt and pyproject.toml dependencies",
+      "Replace pkg_resources.resource_filename with importlib.resources.files in linkwatch/resources.py"
+    ],
+    "suggested_tests": [
+      "Verify that the application can still locate and load the status.html.j2 template"
+    ],
+    "predicted_outcome": "pass",
+    "confidence": 1.0,
+    "raw": "{\n  \"risk_explanation\": \"The 'pkg_resources' module from 'setuptools' is deprecated. The 'importlib.resources' module in the standard library is the modern, recommended alternative for accessing package resources in Python 3.9+.\",\n  \"replacement\": \"importlib.resources (stdlib)\",\n  \"migration_type\": \"remove\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"setuptools\"\n    }\n  ],\n  \"file_edits\": [\n    {\n      \"path\": \"linkwatch/resources.py\",\n      \"new_content\": \"from importlib import resources\\n\\nTEMPLATE_NAME = \\\"status.html.j2\\\"\\n\\n\\ndef template_dir():\\n    return str(resources.files(\\\"linkwatch\\\") / \\\"templates\\\")\\n\"\n    },\n    {\n      \"path\": \"pyproject.toml\",\n      \"new_content\": \"[build-system]\\nrequires = [\\\"setuptools>=61\\\"]\\nbuild-backend = \\\"setuptools.build_meta\\\"\\n\\n[project]\\nname = \\\"linkwatch\\\"\\nversion = \\\"0.3.1\\\"\\ndescription = \\\"A small CLI link and uptime checker with an HTML status page\\\"\\nreadme = \\\"README.md\\\"\\nlicense = { text = \\\"MIT\\\" }\\nrequires-python = \\\">=3.10\\\"\\ndependencies = [\\n    \\\"toml==0.10.2\\\",\\n    \\\"appdirs==1.4.4\\\",\\n    \\\"requests==2.31.0\\\",\\n    \\\"Jinja2==2.11.3\\\",\\n    \\\"pydantic>=2\\\",\\n    \\\"click>=7\\\",\\n    \\\"six\\\",\\n    \\\"chardet==5.2.0\\\",\\n    \\\"idna==2.7\\\",\\n    \\\"python-dateutil\\\",\\n    \\\"rich\\\",\\n]\\n\\n[project.scripts]\\nlinkwatch = \\\"linkwatch.cli:cli\\\"\\n\\n[tool.setuptools]\\npackages = [\\\"linkwatch\\\"]\\n\\n[tool.setuptools.package-data]\\nlinkwatch = [\\\"templates/*.j2\\\"]\\n\\n[tool.pytest.ini_options]\\ntestpaths = [\\\"tests\\\"]\\n\"\n    }\n  ],\n  \"steps\": [\n    \"Remove setuptools from requirements.txt and pyproject.toml dependencies\",\n    \"Replace pkg_resources.resource_filename with importlib.resources.files in linkwatch/resources.py\"\n  ],\n  \"suggested_tests\": [\n    \"Verify that the application can still locate and load the status.html.j2 template\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+  },
+  "patch": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -6,7 +6,6 @@\n click>=7\r\n six\r\n chardet==5.2.0\r\n-setuptools==75.8.0\r\n idna==2.7\r\n python-dateutil\r\n rich\r\n--- a/linkwatch/resources.py\n+++ b/linkwatch/resources.py\n@@ -1,7 +1,7 @@\n-import pkg_resources\r\n-\r\n-TEMPLATE_NAME = \"status.html.j2\"\r\n-\r\n-\r\n-def template_dir():\r\n-    return pkg_resources.resource_filename(\"linkwatch\", \"templates\")\r\n+from importlib import resources\n+\n+TEMPLATE_NAME = \"status.html.j2\"\n+\n+\n+def template_dir():\n+    return str(resources.files(\"linkwatch\") / \"templates\")\n",
+  "run": {
+    "label": "setuptools",
+    "stage": "tests",
+    "ok": false,
+    "python_version": "3.12.5",
+    "venv_python": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\candidates\\setuptools\\.venv\\Scripts\\python.exe",
+    "tests": 10,
+    "passed": 9,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 0,
+    "failing_tests": {
+      "tests/test_report.py::test_report_renders_all_sites": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (.venv\\Lib\\site-packages\\markupsafe\\__init__.py)"
+    },
+    "warnings": [],
+    "duration_s": 25.0,
+    "commands": [
+      "py -3.12 -m venv --clear .venv",
+      ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
+      ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+    ],
+    "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\setuptools.log"
+  },
+  "comparison": {
+    "verdict": "improved",
+    "actual_outcome": "pass",
+    "predicted_outcome": "pass",
+    "prediction_correct": true,
+    "newly_failing": [],
+    "newly_passing": [],
+    "still_failing": [
+      "tests/test_report.py::test_report_renders_all_sites"
+    ],
+    "new_warnings": [],
+    "gone_warnings": [
+      "linkwatch\\resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html"
+    ],
+    "gaps": []
+  }
+}

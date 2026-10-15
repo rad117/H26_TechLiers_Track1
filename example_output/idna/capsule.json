@@ -1,0 +1,112 @@
+{
+  "dep": {
+    "name": "idna",
+    "import_names": [
+      "idna"
+    ],
+    "status": "unused",
+    "specs": {
+      "requirements.txt": "==2.7",
+      "pyproject.toml": "==2.7"
+    },
+    "pinned_version": "2.7",
+    "spec_mismatch": false,
+    "usages": [],
+    "pypi": {
+      "latest": "3.20",
+      "latest_date": "2026-09-17",
+      "pinned_date": "2018-06-11",
+      "inactive": false,
+      "requires_python": ">=3.9"
+    },
+    "signals": [
+      {
+        "id": "major_behind",
+        "detail": "pinned 2.7, latest 3.20",
+        "points": -25,
+        "source": "pypi"
+      },
+      {
+        "id": "old_pin",
+        "detail": "2.7 released 2018-06-11 (8 years ago)",
+        "points": -20,
+        "source": "pypi"
+      },
+      {
+        "id": "unused",
+        "detail": "declared but never imported",
+        "points": -10,
+        "source": "code_scan"
+      }
+    ],
+    "health_score": 45,
+    "at_risk": true
+  },
+  "ai": {
+    "source": "gemma",
+    "model": "gemma-4-31b-it",
+    "ok": true,
+    "prompt_key": "53777131e749e2b4",
+    "risk_explanation": "The idna dependency is pinned to an extremely old version (2.7 from 2018) and is declared as unused in the project's source code.",
+    "replacement": "None",
+    "migration_type": "remove",
+    "requirement_changes": [
+      {
+        "action": "remove",
+        "name": "idna",
+        "line": ""
+      }
+    ],
+    "file_edits": [],
+    "steps": [
+      "Remove idna==2.7 from requirements.txt",
+      "Remove idna==2.7 from the dependencies list in pyproject.toml"
+    ],
+    "suggested_tests": [
+      "Run pytest to ensure no hidden dependencies on idna exist"
+    ],
+    "predicted_outcome": "pass",
+    "confidence": 1.0,
+    "raw": "{\n  \"risk_explanation\": \"The idna dependency is pinned to an extremely old version (2.7 from 2018) and is declared as unused in the project's source code.\",\n  \"replacement\": \"None\",\n  \"migration_type\": \"remove\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"idna\"\n    }\n  ],\n  \"file_edits\": [\n    {\n      \"path\": \"pyproject.toml\",\n      \"new_content\": \"[build-system]\\nrequires = [\\\"setuptools>=61\\\"]\\nbuild-backend = \\\"setuptools.build_meta\\\"\\n\\n[project]\\nname = \\\"linkwatch\\\"\\nversion = \\\"0.3.1\\\"\\ndescription = \\\"A small CLI link and uptime checker with an HTML status page\\\"\\nreadme = \\\"README.md\\\"\\nlicense = { text = \\\"MIT\\\" }\\nrequires-python = \\\">=3.10\\\"\\ndependencies = [\\n    \\\"toml==0.10.2\\\",\\n    \\\"appdirs==1.4.4\\\",\\n    \\\"requests==2.31.0\\\",\\n    \\\"Jinja2==2.11.3\\\",\\n    \\\"pydantic>=2\\\",\\n    \\\"click>=7\\\",\\n    \\\"six\\\",\\n    \\\"chardet==5.2.0\\\",\\n    \\\"setuptools==75.8.0\\\",\\n    \\\"python-dateutil\\\",\\n    \\\"rich\\\",\\n]\\n\\n[project.scripts]\\nlinkwatch = \\\"linkwatch.cli:cli\\\"\\n\\n[tool.setuptools]\\npackages = [\\\"linkwatch\\\"]\\n\\n[tool.setuptools.package-data]\\nlinkwatch = [\\\"templates/*.j2\\\"]\\n\\n[tool.pytest.ini_options]\\ntestpaths = [\\\"tests\\\"]\"\n    }\n  ],\n  \"steps\": [\n    \"Remove idna==2.7 from requirements.txt\",\n    \"Remove idna==2.7 from the dependencies list in pyproject.toml\"\n  ],\n  \"suggested_tests\": [\n    \"Run pytest to ensure no hidden dependencies on idna exist\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+  },
+  "patch": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -7,7 +7,6 @@\n six\r\n chardet==5.2.0\r\n setuptools==75.8.0\r\n-idna==2.7\r\n python-dateutil\r\n rich\r\n # PyYAML==5.1\r\n",
+  "run": {
+    "label": "idna",
+    "stage": "tests",
+    "ok": false,
+    "python_version": "3.12.5",
+    "venv_python": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\candidates\\idna\\.venv\\Scripts\\python.exe",
+    "tests": 10,
+    "passed": 9,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 0,
+    "failing_tests": {
+      "tests/test_report.py::test_report_renders_all_sites": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (.venv\\Lib\\site-packages\\markupsafe\\__init__.py)"
+    },
+    "warnings": [
+      "linkwatch\\resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html"
+    ],
+    "duration_s": 27.9,
+    "commands": [
+      "py -3.12 -m venv --clear .venv",
+      ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
+      ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+    ],
+    "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\idna.log"
+  },
+  "comparison": {
+    "verdict": "same",
+    "actual_outcome": "pass",
+    "predicted_outcome": "pass",
+    "prediction_correct": true,
+    "newly_failing": [],
+    "newly_passing": [],
+    "still_failing": [
+      "tests/test_report.py::test_report_renders_all_sites"
+    ],
+    "new_warnings": [],
+    "gone_warnings": [],
+    "gaps": []
+  }
+}

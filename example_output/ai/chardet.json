@@ -1,0 +1,38 @@
+{
+  "source": "gemma",
+  "model": "gemma-4-26b-a4b-it",
+  "ok": true,
+  "prompt_key": "c46e233a985f4aa9",
+  "risk_explanation": "The chardet dependency is significantly outdated, with the project pinned to version 5.2.0 while 7.6.0 is available. Additionally, chardet is largely superseded in the modern Python ecosystem by charset-normalizer, which provides better performance and accuracy.",
+  "replacement": "charset-normalizer>=3.0.0",
+  "migration_type": "swap",
+  "requirement_changes": [
+    {
+      "action": "remove",
+      "name": "chardet",
+      "line": "chardet==5.2.0"
+    },
+    {
+      "action": "add",
+      "name": "charset-normalizer",
+      "line": "charset-normalizer>=3.0.0"
+    }
+  ],
+  "file_edits": [
+    {
+      "path": "linkwatch/encoding.py",
+      "new_content": "import html\nimport re\n\nimport charset_normalizer\nfrom requests.utils import _parse_content_type_header\n\nTITLE_RE = re.compile(r\"<title[^>]*>(.*?)</title>\", re.IGNORECASE | re.DOTALL)\n\n\ndef detect_encoding(resp):\n    _, params = _parse_content_type_header(resp.headers.get(\"Content-Type\", \"\"))\n    charset = params.get(\"charset\")\n    if charset and charset is not True:\n        return charset\n    result = charset_normalizer.from_bytes(resp.content).best()\n    return result.encoding if result else \"utf-8\"\n\n\ndef page_title(resp):\n    if not resp.content:\n        return \"\"\n    text = resp.content.decode(detect_encoding(resp), errors=\"replace\")\n    match = TITLE_RE.search(text)\n    if not match:\n        return \"\"\n    return html.unescape(\" \".join(match.group(1).split()))\n"
+    }
+  ],
+  "steps": [
+    "Remove chardet from requirements.txt and add charset-normalizer>=3.0.0.",
+    "Update pyproject.toml dependencies to replace chardet with charset-normalizer.",
+    "Update linkwatch/encoding.py to use charset_normalizer for character encoding detection."
+  ],
+  "suggested_tests": [
+    "Verify that detect_encoding correctly identifies non-UTF-8 encodings like ISO-8859-1 using a sample response."
+  ],
+  "predicted_outcome": "pass",
+  "confidence": 0.95,
+  "raw": "{\n  \"risk_explanation\": \"The chardet dependency is significantly outdated, with the project pinned to version 5.2.0 while 7.6.0 is available. Additionally, chardet is largely superseded in the modern Python ecosystem by charset-normalizer, which provides better performance and accuracy.\",\n  \"replacement\": \"charset-normalizer>=3.0.0\",\n  \"migration_type\": \"swap\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"chardet\",\n      \"line\": \"chardet==5.2.0\"\n    },\n    {\n      \"action\": \"add\",\n      \"name\": \"charset-normalizer\",\n      \"line\": \"charset-normalizer>=3.0.0\"\n    }\n  ],\n  \"file_edits\": [\n    {\n      \"path\": \"linkwatch/encoding.py\",\n      \"new_content\": \"import html\\nimport re\\n\\nimport charset_normalizer\\nfrom requests.utils import _parse_content_type_header\\n\\nTITLE_RE = re.compile(r\\\"<title[^>]*>(.*?)</title>\\\", re.IGNORECASE | re.DOTALL)\\n\\n\\ndef detect_encoding(resp):\\n    _, params = _parse_content_type_header(resp.headers.get(\\\"Content-Type\\\", \\\"\\\"))\\n    charset = params.get(\\\"charset\\\")\\n    if charset and charset is not True:\\n        return charset\\n    result = charset_normalizer.from_bytes(resp.content).best()\\n    return result.encoding if result else \\\"utf-8\\\"\\n\\n\\ndef page_title(resp):\\n    if not resp.content:\\n        return \\\"\\\"\\n    text = resp.content.decode(detect_encoding(resp), errors=\\\"replace\\\")\\n    match = TITLE_RE.search(text)\\n    if not match:\\n        return \\\"\\\"\\n    return html.unescape(\\\" \\\".join(match.group(1).split()))\\n\"\n    },\n    {\n      \"path\": \"pyproject.toml\",\n      \"new_content\": \"[build-system]\\nrequires = [\\\"setuptools>=61\\\"]\\nbuild-backend = \\\"setuptools.build_meta\\\"\\n\\n[project]\\nname = \\\"linkwatch\\\"\\nversion = \\\"0.3.1\\\"\\ndescription = \\\"A small CLI link and uptime checker with an HTML status page\\\"\\nreadme = \\\"README.md\\\"\\nlicense = { text = \\\"MIT\\\" }\\nrequires-python = \\\">=3.10\\\"\\ndependencies = [\\n    \\\"toml==0.10.2\\\",\\n    \\\"appdirs==1.4.4\\\",\\n    \\\"requests==2.31.0\\\",\\n    \\\"Jinja2==2.11.3\\\",\\n    \\\"pydantic>=2\\\",\\n    \\\"click>=7\\\",\\n    \\\"six\\\",\\n    \\\"charset-normalizer>=3.0.0\\\",\\n    \\\"setuptools==75.8.0\\\",\\n    \\\"idna==2.7\\\",\\n    \\\"python-dateutil\\\",\\n    \\\"rich\\\",\\n]\\n\\n[project.scripts]\\nlinkwatch = \\\"linkwatch.cli:cli\\\"\\n\\n[tool.setuptools]\\npackages = [\\\"linkwatch\\\"]\\n\\n[tool.setuptools.package-data]\\nlinkwatch = [\\\"templates/*.j2\\\"]\\n\\n[tool.pytest.ini_options]\\ntestpaths = [\\\"tests\\\"]\\n\"\n    }\n  ],\n  \"steps\": [\n    \"Remove chardet from requirements.txt and add charset-normalizer>=3.0.0.\",\n    \"Update pyproject.toml dependencies to replace chardet with charset-normalizer.\",\n    \"Update linkwatch/encoding.py to use charset_normalizer for character encoding detection.\"\n  ],\n  \"suggested_tests\": [\n    \"Verify that detect_encoding correctly identifies non-UTF-8 encodings like ISO-8859-1 using a sample response.\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 0.95\n}"
+}

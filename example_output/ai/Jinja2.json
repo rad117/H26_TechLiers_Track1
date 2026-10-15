@@ -1,0 +1,26 @@
+{
+  "source": "gemma",
+  "model": "gemma-4-26b-a4b-it",
+  "ok": true,
+  "prompt_key": "63c4ba205f7eb389",
+  "risk_explanation": "Jinja2 2.11.3 is incompatible with modern versions of MarkupSafe, leading to an ImportError when attempting to import 'soft_unicode'. Upgrading to Jinja2 3.x resolves this conflict and maintains compatibility with current dependencies.",
+  "replacement": "Jinja2>=3.1.0",
+  "migration_type": "bump",
+  "requirement_changes": [
+    {
+      "action": "set",
+      "name": "Jinja2",
+      "line": "Jinja2==3.1.6"
+    }
+  ],
+  "file_edits": [],
+  "steps": [
+    "Update Jinja2 from 2.11.3 to 3.1.6 in requirements.txt to resolve MarkupSafe incompatibility."
+  ],
+  "suggested_tests": [
+    "pytest"
+  ],
+  "predicted_outcome": "pass",
+  "confidence": 1.0,
+  "raw": "{\n  \"risk_explanation\": \"Jinja2 2.11.3 is incompatible with modern versions of MarkupSafe, leading to an ImportError when attempting to import 'soft_unicode'. Upgrading to Jinja2 3.x resolves this conflict and maintains compatibility with current dependencies.\",\n  \"replacement\": \"Jinja2>=3.1.0\",\n  \"migration_type\": \"bump\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"set\",\n      \"name\": \"Jinja2\",\n      \"line\": \"Jinja2==3.1.6\"\n    }\n  ],\n  \"file_edits\": [],\n  \"steps\": [\n    \"Update Jinja2 from 2.11.3 to 3.1.6 in requirements.txt to resolve MarkupSafe incompatibility.\"\n  ],\n  \"suggested_tests\": [\n    \"pytest\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+}

@@ -1,0 +1,121 @@
+{
+  "dep": {
+    "name": "toml",
+    "import_names": [
+      "toml"
+    ],
+    "status": "declared",
+    "specs": {
+      "requirements.txt": "==0.10.2",
+      "pyproject.toml": "==0.10.2"
+    },
+    "pinned_version": "0.10.2",
+    "spec_mismatch": false,
+    "usages": [
+      {
+        "file": "linkwatch/config.py",
+        "line": 3,
+        "code": "import toml",
+        "names": [],
+        "private": false,
+        "is_test": false
+      }
+    ],
+    "pypi": {
+      "latest": "0.10.2",
+      "latest_date": "2020-11-01",
+      "pinned_date": "2020-11-01",
+      "inactive": true,
+      "requires_python": ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+    },
+    "signals": [
+      {
+        "id": "old_pin",
+        "detail": "0.10.2 released 2020-11-01 (5 years ago)",
+        "points": -20,
+        "source": "pypi"
+      },
+      {
+        "id": "inactive",
+        "detail": "last release 2020-11-01, or marked Inactive",
+        "points": -20,
+        "source": "pypi"
+      }
+    ],
+    "health_score": 60,
+    "at_risk": true
+  },
+  "ai": {
+    "source": "gemma",
+    "model": "gemma-4-26b-a4b-it",
+    "ok": true,
+    "prompt_key": "da32d76fea04a651",
+    "risk_explanation": "The `toml` library is unmaintained and has not seen a release since 2020. Since the project uses Python 3.12, the dependency can be replaced with the built-in `tomllib` module from the standard library.",
+    "replacement": "tomllib (stdlib alternative)",
+    "migration_type": "remove",
+    "requirement_changes": [
+      {
+        "action": "remove",
+        "name": "toml",
+        "line": "toml==0.10.2"
+      }
+    ],
+    "file_edits": [
+      {
+        "path": "linkwatch/config.py",
+        "new_content": "from typing import List\n\nimport tomllib\nfrom pydantic import BaseModel, validator\n\n\nclass Site(BaseModel):\n    name: str\n    url: str\n\n    class Config:\n        anystr_strip_whitespace = True\n\n    @validator(\"name\")\n    def name_not_empty(cls, value):\n        if not value:\n            raise ValueError(\"site name can not be empty\")\n        return value\n\n    @validator(\"url\")\n    def url_has_scheme(cls, value):\n        if not value.startswith((\"http://\", \"https://\")):\n            raise ValueError(\"url must start with http:// or https://\")\n        return value\n\n\nclass Settings(BaseModel):\n    title: str = \"linkwatch\"\n    output: str = \"status.html\"\n    sites: List[Site] = []\n\n    class Config:\n        extra = \"forbid\"\n\n\ndef load_settings(path=\"sites.toml\"):\n    with open(path, \"rb\") as f:\n        data = tomllib.load(f)\n    return Settings(**data)\n"
+      }
+    ],
+    "steps": [
+      "Remove toml from requirements.txt and pyproject.toml",
+      "Replace 'import toml' with 'import tomllib' in linkwatch/config.py",
+      "Update load_settings in linkwatch/config.py to open the file in binary mode and use tomllib.load()"
+    ],
+    "suggested_tests": [
+      "Create a dummy sites.toml and run load_settings to verify successful parsing."
+    ],
+    "predicted_outcome": "pass",
+    "confidence": 1.0,
+    "raw": "{\n  \"risk_explanation\": \"The `toml` library is unmaintained and has not seen a release since 2020. Since the project uses Python 3.12, the dependency can be replaced with the built-in `tomllib` module from the standard library.\",\n  \"replacement\": \"tomllib (stdlib alternative)\",\n  \"migration_type\": \"remove\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"toml\",\n      \"line\": \"toml==0.10.2\"\n    }\n  ],\n  \"file_edits\": [\n    {\n      \"path\": \"pyproject.toml\",\n      \"new_content\": \"[build-system]\\nrequires = [\\\"setuptools>=61\\\"]\\nbuild-backend = \\\"setuptools.build_meta\\\"\\n\\n[project]\\nname = \\\"linkwatch\\\"\\nversion = \\\"0.3.1\\\"\\ndescription = \\\"A small CLI link and uptime checker with an HTML status page\\\"\\nreadme = \\\"README.md\\\"\\nlicense = { text = \\\"MIT\\\" }\\nrequires-python = \\\">=3.10\\\"\\ndependencies = [\\n    \\\"appdirs==1.4.4\\\",\\n    \\\"requests==2.31.0\\\",\\n    \\\"Jinja2==2.11.3\\\",\\n    \\\"pydantic>=2\\\",\\n    \\\"click>=7\\\",\\n    \\\"six\\\",\\n    \\\"chardet==5.2.0\\\",\\n    \\\"setuptools==75.8.0\\\",\\n    \\\"idna==2.7\\\",\\n    \\\"python-dateutil\\\",\\n    \\\"rich\\\",\\n]\\n\\n[project.scripts]\\nlinkwatch = \\\"linkwatch.cli:cli\\\"\\n\\n[tool.setuptools]\\npackages = [\\\"linkwatch\\\"]\\n\\n[tool.setuptools.package-data]\\nlinkwatch = [\\\"templates/*.j2\\\"]\\n\\n[tool.pytest.ini_options]\\ntestpaths = [\\\"tests\\\"]\\n\"\n    },\n    {\n      \"path\": \"linkwatch/config.py\",\n      \"new_content\": \"from typing import List\\n\\nimport tomllib\\nfrom pydantic import BaseModel, validator\\n\\n\\nclass Site(BaseModel):\\n    name: str\\n    url: str\\n\\n    class Config:\\n        anystr_strip_whitespace = True\\n\\n    @validator(\\\"name\\\")\\n    def name_not_empty(cls, value):\\n        if not value:\\n            raise ValueError(\\\"site name can not be empty\\\")\\n        return value\\n\\n    @validator(\\\"url\\\")\\n    def url_has_scheme(cls, value):\\n        if not value.startswith((\\\"http://\\\", \\\"https://\\\")):\\n            raise ValueError(\\\"url must start with http:// or https://\\\")\\n        return value\\n\\n\\nclass Settings(BaseModel):\\n    title: str = \\\"linkwatch\\\"\\n    output: str = \\\"status.html\\\"\\n    sites: List[Site] = []\\n\\n    class Config:\\n        extra = \\\"forbid\\\"\\n\\n\\ndef load_settings(path=\\\"sites.toml\\\"):\\n    with open(path, \\\"rb\\\") as f:\\n        data = tomllib.load(f)\\n    return Settings(**data)\\n\"\n    }\n  ],\n  \"steps\": [\n    \"Remove toml from requirements.txt and pyproject.toml\",\n    \"Replace 'import toml' with 'import tomllib' in linkwatch/config.py\",\n    \"Update load_settings in linkwatch/config.py to open the file in binary mode and use tomllib.load()\"\n  ],\n  \"suggested_tests\": [\n    \"Create a dummy sites.toml and run load_settings to verify successful parsing.\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+  },
+  "patch": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -1,4 +1,3 @@\n-toml==0.10.2\r\n appdirs==1.4.4\r\n requests==2.31.0\r\n Jinja2==2.11.3\r\n--- a/linkwatch/config.py\n+++ b/linkwatch/config.py\n@@ -1,38 +1,39 @@\n-from typing import List\r\n-\r\n-import toml\r\n-from pydantic import BaseModel, validator\r\n-\r\n-\r\n-class Site(BaseModel):\r\n-    name: str\r\n-    url: str\r\n-\r\n-    class Config:\r\n-        anystr_strip_whitespace = True\r\n-\r\n-    @validator(\"name\")\r\n-    def name_not_empty(cls, value):\r\n-        if not value:\r\n-            raise ValueError(\"site name can not be empty\")\r\n-        return value\r\n-\r\n-    @validator(\"url\")\r\n-    def url_has_scheme(cls, value):\r\n-        if not value.startswith((\"http://\", \"https://\")):\r\n-            raise ValueError(\"url must start with http:// or https://\")\r\n-        return value\r\n-\r\n-\r\n-class Settings(BaseModel):\r\n-    title: str = \"linkwatch\"\r\n-    output: str = \"status.html\"\r\n-    sites: List[Site] = []\r\n-\r\n-    class Config:\r\n-        extra = \"forbid\"\r\n-\r\n-\r\n-def load_settings(path=\"sites.toml\"):\r\n-    data = toml.load(path)\r\n-    return Settings(**data)\r\n+from typing import List\n+\n+import tomllib\n+from pydantic import BaseModel, validator\n+\n+\n+class Site(BaseModel):\n+    name: str\n+    url: str\n+\n+    class Config:\n+        anystr_strip_whitespace = True\n+\n+    @validator(\"name\")\n+    def name_not_empty(cls, value):\n+        if not value:\n+            raise ValueError(\"site name can not be empty\")\n+        return value\n+\n+    @validator(\"url\")\n+    def url_has_scheme(cls, value):\n+        if not value.startswith((\"http://\", \"https://\")):\n+            raise ValueError(\"url must start with http:// or https://\")\n+        return value\n+\n+\n+class Settings(BaseModel):\n+    title: str = \"linkwatch\"\n+    output: str = \"status.html\"\n+    sites: List[Site] = []\n+\n+    class Config:\n+        extra = \"forbid\"\n+\n+\n+def load_settings(path=\"sites.toml\"):\n+    with open(path, \"rb\") as f:\n+        data = tomllib.load(f)\n+    return Settings(**data)\n",
+  "run": {
+    "label": "toml",
+    "stage": "tests",
+    "ok": false,
+    "python_version": "3.12.5",
+    "venv_python": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\candidates\\toml\\.venv\\Scripts\\python.exe",
+    "tests": 10,
+    "passed": 9,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 0,
+    "failing_tests": {
+      "tests/test_report.py::test_report_renders_all_sites": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (.venv\\Lib\\site-packages\\markupsafe\\__init__.py)"
+    },
+    "warnings": [
+      "linkwatch\\resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html"
+    ],
+    "duration_s": 32.9,
+    "commands": [
+      "py -3.12 -m venv --clear .venv",
+      ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
+      ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+    ],
+    "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\toml.log"
+  },
+  "comparison": {
+    "verdict": "same",
+    "actual_outcome": "pass",
+    "predicted_outcome": "pass",
+    "prediction_correct": true,
+    "newly_failing": [],
+    "newly_passing": [],
+    "still_failing": [
+      "tests/test_report.py::test_report_renders_all_sites"
+    ],
+    "new_warnings": [],
+    "gone_warnings": [],
+    "gaps": []
+  }
+}

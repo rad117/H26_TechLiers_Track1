@@ -1,0 +1,32 @@
+{
+  "source": "gemma",
+  "model": "gemma-4-31b-it",
+  "ok": true,
+  "prompt_key": "9e8f2a73ac2fb577",
+  "risk_explanation": "The 'pkg_resources' module from 'setuptools' is deprecated. The 'importlib.resources' module in the standard library is the modern, recommended alternative for accessing package resources in Python 3.9+.",
+  "replacement": "importlib.resources (stdlib)",
+  "migration_type": "remove",
+  "requirement_changes": [
+    {
+      "action": "remove",
+      "name": "setuptools",
+      "line": ""
+    }
+  ],
+  "file_edits": [
+    {
+      "path": "linkwatch/resources.py",
+      "new_content": "from importlib import resources\n\nTEMPLATE_NAME = \"status.html.j2\"\n\n\ndef template_dir():\n    return str(resources.files(\"linkwatch\") / \"templates\")\n"
+    }
+  ],
+  "steps": [
+    "Remove setuptools from requirements.txt and pyproject.toml dependencies",
+    "Replace pkg_resources.resource_filename with importlib.resources.files in linkwatch/resources.py"
+  ],
+  "suggested_tests": [
+    "Verify that the application can still locate and load the status.html.j2 template"
+  ],
+  "predicted_outcome": "pass",
+  "confidence": 1.0,
+  "raw": "{\n  \"risk_explanation\": \"The 'pkg_resources' module from 'setuptools' is deprecated. The 'importlib.resources' module in the standard library is the modern, recommended alternative for accessing package resources in Python 3.9+.\",\n  \"replacement\": \"importlib.resources (stdlib)\",\n  \"migration_type\": \"remove\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"setuptools\"\n    }\n  ],\n  \"file_edits\": [\n    {\n      \"path\": \"linkwatch/resources.py\",\n      \"new_content\": \"from importlib import resources\\n\\nTEMPLATE_NAME = \\\"status.html.j2\\\"\\n\\n\\ndef template_dir():\\n    return str(resources.files(\\\"linkwatch\\\") / \\\"templates\\\")\\n\"\n    },\n    {\n      \"path\": \"pyproject.toml\",\n      \"new_content\": \"[build-system]\\nrequires = [\\\"setuptools>=61\\\"]\\nbuild-backend = \\\"setuptools.build_meta\\\"\\n\\n[project]\\nname = \\\"linkwatch\\\"\\nversion = \\\"0.3.1\\\"\\ndescription = \\\"A small CLI link and uptime checker with an HTML status page\\\"\\nreadme = \\\"README.md\\\"\\nlicense = { text = \\\"MIT\\\" }\\nrequires-python = \\\">=3.10\\\"\\ndependencies = [\\n    \\\"toml==0.10.2\\\",\\n    \\\"appdirs==1.4.4\\\",\\n    \\\"requests==2.31.0\\\",\\n    \\\"Jinja2==2.11.3\\\",\\n    \\\"pydantic>=2\\\",\\n    \\\"click>=7\\\",\\n    \\\"six\\\",\\n    \\\"chardet==5.2.0\\\",\\n    \\\"idna==2.7\\\",\\n    \\\"python-dateutil\\\",\\n    \\\"rich\\\",\\n]\\n\\n[project.scripts]\\nlinkwatch = \\\"linkwatch.cli:cli\\\"\\n\\n[tool.setuptools]\\npackages = [\\\"linkwatch\\\"]\\n\\n[tool.setuptools.package-data]\\nlinkwatch = [\\\"templates/*.j2\\\"]\\n\\n[tool.pytest.ini_options]\\ntestpaths = [\\\"tests\\\"]\\n\"\n    }\n  ],\n  \"steps\": [\n    \"Remove setuptools from requirements.txt and pyproject.toml dependencies\",\n    \"Replace pkg_resources.resource_filename with importlib.resources.files in linkwatch/resources.py\"\n  ],\n  \"suggested_tests\": [\n    \"Verify that the application can still locate and load the status.html.j2 template\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+}

@@ -1,0 +1,122 @@
+{
+  "dep": {
+    "name": "Jinja2",
+    "import_names": [
+      "jinja2"
+    ],
+    "status": "declared",
+    "specs": {
+      "requirements.txt": "==2.11.3",
+      "pyproject.toml": "==2.11.3"
+    },
+    "pinned_version": "2.11.3",
+    "spec_mismatch": false,
+    "usages": [
+      {
+        "file": "linkwatch/report.py",
+        "line": 3,
+        "code": "from jinja2 import Environment, FileSystemLoader, select_autoescape",
+        "names": [
+          "Environment",
+          "FileSystemLoader",
+          "select_autoescape"
+        ],
+        "private": false,
+        "is_test": false
+      }
+    ],
+    "pypi": {
+      "latest": "3.1.6",
+      "latest_date": "2025-03-05",
+      "pinned_date": "2021-01-31",
+      "inactive": false,
+      "requires_python": ">=3.7"
+    },
+    "signals": [
+      {
+        "id": "fails_in_baseline",
+        "detail": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (.venv\\Lib\\site-packages\\markupsafe\\__init__.py)",
+        "points": -30,
+        "source": "baseline_tests"
+      },
+      {
+        "id": "major_behind",
+        "detail": "pinned 2.11.3, latest 3.1.6",
+        "points": -25,
+        "source": "pypi"
+      },
+      {
+        "id": "old_pin",
+        "detail": "2.11.3 released 2021-01-31 (5 years ago)",
+        "points": -20,
+        "source": "pypi"
+      }
+    ],
+    "health_score": 25,
+    "at_risk": true
+  },
+  "ai": {
+    "source": "gemma",
+    "model": "gemma-4-26b-a4b-it",
+    "ok": true,
+    "prompt_key": "63c4ba205f7eb389",
+    "risk_explanation": "Jinja2 2.11.3 is incompatible with modern versions of MarkupSafe, leading to an ImportError when attempting to import 'soft_unicode'. Upgrading to Jinja2 3.x resolves this conflict and maintains compatibility with current dependencies.",
+    "replacement": "Jinja2>=3.1.0",
+    "migration_type": "bump",
+    "requirement_changes": [
+      {
+        "action": "set",
+        "name": "Jinja2",
+        "line": "Jinja2==3.1.6"
+      }
+    ],
+    "file_edits": [],
+    "steps": [
+      "Update Jinja2 from 2.11.3 to 3.1.6 in requirements.txt to resolve MarkupSafe incompatibility."
+    ],
+    "suggested_tests": [
+      "pytest"
+    ],
+    "predicted_outcome": "pass",
+    "confidence": 1.0,
+    "raw": "{\n  \"risk_explanation\": \"Jinja2 2.11.3 is incompatible with modern versions of MarkupSafe, leading to an ImportError when attempting to import 'soft_unicode'. Upgrading to Jinja2 3.x resolves this conflict and maintains compatibility with current dependencies.\",\n  \"replacement\": \"Jinja2>=3.1.0\",\n  \"migration_type\": \"bump\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"set\",\n      \"name\": \"Jinja2\",\n      \"line\": \"Jinja2==3.1.6\"\n    }\n  ],\n  \"file_edits\": [],\n  \"steps\": [\n    \"Update Jinja2 from 2.11.3 to 3.1.6 in requirements.txt to resolve MarkupSafe incompatibility.\"\n  ],\n  \"suggested_tests\": [\n    \"pytest\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+  },
+  "patch": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -1,7 +1,7 @@\n toml==0.10.2\r\n appdirs==1.4.4\r\n requests==2.31.0\r\n-Jinja2==2.11.3\r\n+Jinja2==3.1.6\n pydantic==1.10.13\r\n click>=7\r\n six\r\n",
+  "run": {
+    "label": "Jinja2",
+    "stage": "tests",
+    "ok": true,
+    "python_version": "3.12.5",
+    "venv_python": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\candidates\\Jinja2\\.venv\\Scripts\\python.exe",
+    "tests": 10,
+    "passed": 10,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "failing_tests": {},
+    "warnings": [
+      "linkwatch\\resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html"
+    ],
+    "duration_s": 29.4,
+    "commands": [
+      "py -3.12 -m venv --clear .venv",
+      ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
+      ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+    ],
+    "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\Jinja2.log"
+  },
+  "comparison": {
+    "verdict": "improved",
+    "actual_outcome": "pass",
+    "predicted_outcome": "pass",
+    "prediction_correct": true,
+    "newly_failing": [],
+    "newly_passing": [
+      "tests/test_report.py::test_report_renders_all_sites"
+    ],
+    "still_failing": [],
+    "new_warnings": [],
+    "gone_warnings": [],
+    "gaps": []
+  }
+}

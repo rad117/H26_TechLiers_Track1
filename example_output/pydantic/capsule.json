@@ -1,0 +1,130 @@
+{
+  "dep": {
+    "name": "pydantic",
+    "import_names": [
+      "pydantic"
+    ],
+    "status": "declared",
+    "specs": {
+      "requirements.txt": "==1.10.13",
+      "pyproject.toml": ">=2"
+    },
+    "pinned_version": "1.10.13",
+    "spec_mismatch": true,
+    "usages": [
+      {
+        "file": "linkwatch/config.py",
+        "line": 4,
+        "code": "from pydantic import BaseModel, validator",
+        "names": [
+          "BaseModel",
+          "validator"
+        ],
+        "private": false,
+        "is_test": false
+      }
+    ],
+    "pypi": {
+      "latest": "2.14.1",
+      "latest_date": "2026-10-11",
+      "pinned_date": "2023-09-27",
+      "inactive": false,
+      "requires_python": ">=3.10"
+    },
+    "signals": [
+      {
+        "id": "major_behind",
+        "detail": "pinned 1.10.13, latest 2.14.1",
+        "points": -25,
+        "source": "pypi"
+      },
+      {
+        "id": "old_pin",
+        "detail": "1.10.13 released 2023-09-27 (3 years ago)",
+        "points": -20,
+        "source": "pypi"
+      },
+      {
+        "id": "spec_mismatch",
+        "detail": "requirements.txt: ==1.10.13, pyproject.toml: >=2",
+        "points": -15,
+        "source": "repo_files"
+      }
+    ],
+    "health_score": 40,
+    "at_risk": true
+  },
+  "ai": {
+    "source": "gemma",
+    "model": "gemma-4-26b-a4b-it",
+    "ok": true,
+    "prompt_key": "ea9b82e4014e6e34",
+    "risk_explanation": "The project is using an outdated version of Pydantic (1.10.13) which conflicts with the requirement in pyproject.toml (>=2). Upgrading to Pydantic 2.x is necessary to resolve this mismatch and benefit from performance improvements, but it requires code changes due to breaking API changes in validators and configuration.",
+    "replacement": "pydantic>=2",
+    "migration_type": "bump",
+    "requirement_changes": [
+      {
+        "action": "set",
+        "name": "pydantic",
+        "line": "pydantic>=2"
+      }
+    ],
+    "file_edits": [
+      {
+        "path": "linkwatch/config.py",
+        "new_content": "from typing import List\n\nimport toml\nfrom pydantic import BaseModel, field_validator, ConfigDict\n\n\nclass Site(BaseModel):\n    model_config = ConfigDict(str_strip_whitespace=True)\n\n    name: str\n    url: str\n\n    @field_validator(\"name\")\n    @classmethod\n    def name_not_empty(cls, value: str) -> str:\n        if not value:\n            raise ValueError(\"site name can not be empty\")\n        return value\n\n    @field_validator(\"url\")\n    @classmethod\n    def url_has_scheme(cls, value: str) -> str:\n        if not value.startswith((\"http://\", \"https://\")):\n            raise ValueError(\"url must start with http:// or https://\")\n        return value\n\n\nclass Settings(BaseModel):\n    model_config = ConfigDict(extra=\"forbid\")\n\n    title: str = \"linkwatch\"\n    output: str = \"status.html\"\n    sites: List[Site] = []\n\n\ndef load_settings(path=\"sites.toml\"):\n    data = toml.load(path)\n    return Settings(**data)\n"
+      }
+    ],
+    "steps": [
+      "Update pydantic version in requirements.txt to align with pyproject.toml",
+      "Refactor linkwatch/config.py to use Pydantic V2 field_validator and ConfigDict"
+    ],
+    "suggested_tests": [
+      "Run existing tests to ensure validation logic (empty names, invalid URLs) still works with the new Pydantic API.",
+      "Verify that whitespace stripping on string fields is still active."
+    ],
+    "predicted_outcome": "pass",
+    "confidence": 0.95,
+    "raw": "{\n  \"risk_explanation\": \"The project is using an outdated version of Pydantic (1.10.13) which conflicts with the requirement in pyproject.toml (>=2). Upgrading to Pydantic 2.x is necessary to resolve this mismatch and benefit from performance improvements, but it requires code changes due to breaking API changes in validators and configuration.\",\n  \"replacement\": \"pydantic>=2\",\n  \"migration_type\": \"bump\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"set\",\n      \"name\": \"pydantic\",\n      \"line\": \"pydantic>=2\"\n    }\n  ],\n  \"file_edits\": [\n    {\n      \"path\": \"linkwatch/config.py\",\n      \"new_content\": \"from typing import List\\n\\nimport toml\\nfrom pydantic import BaseModel, field_validator, ConfigDict\\n\\n\\nclass Site(BaseModel):\\n    model_config = ConfigDict(str_strip_whitespace=True)\\n\\n    name: str\\n    url: str\\n\\n    @field_validator(\\\"name\\\")\\n    @classmethod\\n    def name_not_empty(cls, value: str) -> str:\\n        if not value:\\n            raise ValueError(\\\"site name can not be empty\\\")\\n        return value\\n\\n    @field_validator(\\\"url\\\")\\n    @classmethod\\n    def url_has_scheme(cls, value: str) -> str:\\n        if not value.startswith((\\\"http://\\\", \\\"https://\\\")):\\n            raise ValueError(\\\"url must start with http:// or https://\\\")\\n        return value\\n\\n\\nclass Settings(BaseModel):\\n    model_config = ConfigDict(extra=\\\"forbid\\\")\\n\\n    title: str = \\\"linkwatch\\\"\\n    output: str = \\\"status.html\\\"\\n    sites: List[Site] = []\\n\\n\\ndef load_settings(path=\\\"sites.toml\\\"):\\n    data = toml.load(path)\\n    return Settings(**data)\\n\"\n    }\n  ],\n  \"steps\": [\n    \"Update pydantic version in requirements.txt to align with pyproject.toml\",\n    \"Refactor linkwatch/config.py to use Pydantic V2 field_validator and ConfigDict\"\n  ],\n  \"suggested_tests\": [\n    \"Run existing tests to ensure validation logic (empty names, invalid URLs) still works with the new Pydantic API.\",\n    \"Verify that whitespace stripping on string fields is still active.\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 0.95\n}"
+  },
+  "patch": "--- a/requirements.txt\n+++ b/requirements.txt\n@@ -2,7 +2,7 @@\n appdirs==1.4.4\r\n requests==2.31.0\r\n Jinja2==2.11.3\r\n-pydantic==1.10.13\r\n+pydantic>=2\n click>=7\r\n six\r\n chardet==5.2.0\r\n--- a/linkwatch/config.py\n+++ b/linkwatch/config.py\n@@ -1,38 +1,38 @@\n-from typing import List\r\n-\r\n-import toml\r\n-from pydantic import BaseModel, validator\r\n-\r\n-\r\n-class Site(BaseModel):\r\n-    name: str\r\n-    url: str\r\n-\r\n-    class Config:\r\n-        anystr_strip_whitespace = True\r\n-\r\n-    @validator(\"name\")\r\n-    def name_not_empty(cls, value):\r\n-        if not value:\r\n-            raise ValueError(\"site name can not be empty\")\r\n-        return value\r\n-\r\n-    @validator(\"url\")\r\n-    def url_has_scheme(cls, value):\r\n-        if not value.startswith((\"http://\", \"https://\")):\r\n-            raise ValueError(\"url must start with http:// or https://\")\r\n-        return value\r\n-\r\n-\r\n-class Settings(BaseModel):\r\n-    title: str = \"linkwatch\"\r\n-    output: str = \"status.html\"\r\n-    sites: List[Site] = []\r\n-\r\n-    class Config:\r\n-        extra = \"forbid\"\r\n-\r\n-\r\n-def load_settings(path=\"sites.toml\"):\r\n-    data = toml.load(path)\r\n-    return Settings(**data)\r\n+from typing import List\n+\n+import toml\n+from pydantic import BaseModel, field_validator, ConfigDict\n+\n+\n+class Site(BaseModel):\n+    model_config = ConfigDict(str_strip_whitespace=True)\n+\n+    name: str\n+    url: str\n+\n+    @field_validator(\"name\")\n+    @classmethod\n+    def name_not_empty(cls, value: str) -> str:\n+        if not value:\n+            raise ValueError(\"site name can not be empty\")\n+        return value\n+\n+    @field_validator(\"url\")\n+    @classmethod\n+    def url_has_scheme(cls, value: str) -> str:\n+        if not value.startswith((\"http://\", \"https://\")):\n+            raise ValueError(\"url must start with http:// or https://\")\n+        return value\n+\n+\n+class Settings(BaseModel):\n+    model_config = ConfigDict(extra=\"forbid\")\n+\n+    title: str = \"linkwatch\"\n+    output: str = \"status.html\"\n+    sites: List[Site] = []\n+\n+\n+def load_settings(path=\"sites.toml\"):\n+    data = toml.load(path)\n+    return Settings(**data)\n",
+  "run": {
+    "label": "pydantic",
+    "stage": "tests",
+    "ok": false,
+    "python_version": "3.12.5",
+    "venv_python": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\candidates\\pydantic\\.venv\\Scripts\\python.exe",
+    "tests": 10,
+    "passed": 9,
+    "failed": 1,
+    "errors": 0,
+    "skipped": 0,
+    "failing_tests": {
+      "tests/test_report.py::test_report_renders_all_sites": "ImportError: cannot import name 'soft_unicode' from 'markupsafe' (.venv\\Lib\\site-packages\\markupsafe\\__init__.py)"
+    },
+    "warnings": [
+      "linkwatch\\resources.py:1: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html"
+    ],
+    "duration_s": 29.5,
+    "commands": [
+      "py -3.12 -m venv --clear .venv",
+      ".venv\\Scripts\\python.exe -m pip install -r requirements.txt pytest",
+      ".venv\\Scripts\\python.exe -m pytest -q -W default -p no:cacheprovider --junitxml=junit.xml"
+    ],
+    "log_file": "D:\\Hacktober\\LinkWatch\\capsule_out\\_work\\logs\\pydantic.log"
+  },
+  "comparison": {
+    "verdict": "same",
+    "actual_outcome": "pass",
+    "predicted_outcome": "pass",
+    "prediction_correct": true,
+    "newly_failing": [],
+    "newly_passing": [],
+    "still_failing": [
+      "tests/test_report.py::test_report_renders_all_sites"
+    ],
+    "new_warnings": [],
+    "gone_warnings": [],
+    "gaps": []
+  }
+}

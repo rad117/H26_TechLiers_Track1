@@ -1,0 +1,33 @@
+{
+  "source": "gemma",
+  "model": "gemma-4-26b-a4b-it",
+  "ok": true,
+  "prompt_key": "ea9b82e4014e6e34",
+  "risk_explanation": "The project is using an outdated version of Pydantic (1.10.13) which conflicts with the requirement in pyproject.toml (>=2). Upgrading to Pydantic 2.x is necessary to resolve this mismatch and benefit from performance improvements, but it requires code changes due to breaking API changes in validators and configuration.",
+  "replacement": "pydantic>=2",
+  "migration_type": "bump",
+  "requirement_changes": [
+    {
+      "action": "set",
+      "name": "pydantic",
+      "line": "pydantic>=2"
+    }
+  ],
+  "file_edits": [
+    {
+      "path": "linkwatch/config.py",
+      "new_content": "from typing import List\n\nimport toml\nfrom pydantic import BaseModel, field_validator, ConfigDict\n\n\nclass Site(BaseModel):\n    model_config = ConfigDict(str_strip_whitespace=True)\n\n    name: str\n    url: str\n\n    @field_validator(\"name\")\n    @classmethod\n    def name_not_empty(cls, value: str) -> str:\n        if not value:\n            raise ValueError(\"site name can not be empty\")\n        return value\n\n    @field_validator(\"url\")\n    @classmethod\n    def url_has_scheme(cls, value: str) -> str:\n        if not value.startswith((\"http://\", \"https://\")):\n            raise ValueError(\"url must start with http:// or https://\")\n        return value\n\n\nclass Settings(BaseModel):\n    model_config = ConfigDict(extra=\"forbid\")\n\n    title: str = \"linkwatch\"\n    output: str = \"status.html\"\n    sites: List[Site] = []\n\n\ndef load_settings(path=\"sites.toml\"):\n    data = toml.load(path)\n    return Settings(**data)\n"
+    }
+  ],
+  "steps": [
+    "Update pydantic version in requirements.txt to align with pyproject.toml",
+    "Refactor linkwatch/config.py to use Pydantic V2 field_validator and ConfigDict"
+  ],
+  "suggested_tests": [
+    "Run existing tests to ensure validation logic (empty names, invalid URLs) still works with the new Pydantic API.",
+    "Verify that whitespace stripping on string fields is still active."
+  ],
+  "predicted_outcome": "pass",
+  "confidence": 0.95,
+  "raw": "{\n  \"risk_explanation\": \"The project is using an outdated version of Pydantic (1.10.13) which conflicts with the requirement in pyproject.toml (>=2). Upgrading to Pydantic 2.x is necessary to resolve this mismatch and benefit from performance improvements, but it requires code changes due to breaking API changes in validators and configuration.\",\n  \"replacement\": \"pydantic>=2\",\n  \"migration_type\": \"bump\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"set\",\n      \"name\": \"pydantic\",\n      \"line\": \"pydantic>=2\"\n    }\n  ],\n  \"file_edits\": [\n    {\n      \"path\": \"linkwatch/config.py\",\n      \"new_content\": \"from typing import List\\n\\nimport toml\\nfrom pydantic import BaseModel, field_validator, ConfigDict\\n\\n\\nclass Site(BaseModel):\\n    model_config = ConfigDict(str_strip_whitespace=True)\\n\\n    name: str\\n    url: str\\n\\n    @field_validator(\\\"name\\\")\\n    @classmethod\\n    def name_not_empty(cls, value: str) -> str:\\n        if not value:\\n            raise ValueError(\\\"site name can not be empty\\\")\\n        return value\\n\\n    @field_validator(\\\"url\\\")\\n    @classmethod\\n    def url_has_scheme(cls, value: str) -> str:\\n        if not value.startswith((\\\"http://\\\", \\\"https://\\\")):\\n            raise ValueError(\\\"url must start with http:// or https://\\\")\\n        return value\\n\\n\\nclass Settings(BaseModel):\\n    model_config = ConfigDict(extra=\\\"forbid\\\")\\n\\n    title: str = \\\"linkwatch\\\"\\n    output: str = \\\"status.html\\\"\\n    sites: List[Site] = []\\n\\n\\ndef load_settings(path=\\\"sites.toml\\\"):\\n    data = toml.load(path)\\n    return Settings(**data)\\n\"\n    }\n  ],\n  \"steps\": [\n    \"Update pydantic version in requirements.txt to align with pyproject.toml\",\n    \"Refactor linkwatch/config.py to use Pydantic V2 field_validator and ConfigDict\"\n  ],\n  \"suggested_tests\": [\n    \"Run existing tests to ensure validation logic (empty names, invalid URLs) still works with the new Pydantic API.\",\n    \"Verify that whitespace stripping on string fields is still active.\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 0.95\n}"
+}

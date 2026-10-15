@@ -1,0 +1,38 @@
+{
+  "source": "gemma",
+  "model": "gemma-4-26b-a4b-it",
+  "ok": true,
+  "prompt_key": "191f51d9ba12ecdc",
+  "risk_explanation": "appdirs is an inactive dependency that has not been updated since 2020. Replacing it with platformdirs provides a modern, actively maintained alternative for retrieving platform-specific directory paths.",
+  "replacement": "platformdirs",
+  "migration_type": "swap",
+  "requirement_changes": [
+    {
+      "action": "remove",
+      "name": "appdirs",
+      "line": "appdirs==1.4.4"
+    },
+    {
+      "action": "add",
+      "name": "platformdirs",
+      "line": "platformdirs"
+    }
+  ],
+  "file_edits": [
+    {
+      "path": "linkwatch/cache.py",
+      "new_content": "import json\nimport os\n\nfrom platformdirs import user_cache_dir\n\nRESULTS_FILE = \"results.json\"\n\n\ndef cache_dir():\n    path = os.environ.get(\"LINKWATCH_CACHE_DIR\") or user_cache_dir(\"linkwatch\")\n    os.makedirs(path, exist_ok=True)\n    return path\n\n\ndef cache_file():\n    return os.path.join(cache_dir(), RESULTS_FILE)\n\n\ndef save_results(results):\n    path = cache_file()\n    with open(path, \"w\", encoding=\"utf-8\") as fh:\n        json.dump(results, fh, indent=2)\n    return path\n\n\ndef load_results():\n    path = cache_file()\n    if not os.path.exists(path):\n        return []\n    with open(path, encoding=\"utf-8\") as fh:\n        return json.load(fh)\n"
+    }
+  ],
+  "steps": [
+    "Remove appdirs from requirements.txt and pyproject.toml",
+    "Add platformdirs to requirements.txt and pyproject.toml",
+    "Update the import in linkwatch/cache.py from appdirs to platformdirs"
+  ],
+  "suggested_tests": [
+    "Run the application and verify that the cache directory is created in the expected OS-specific location."
+  ],
+  "predicted_outcome": "pass",
+  "confidence": 1.0,
+  "raw": "{\n  \"risk_explanation\": \"appdirs is an inactive dependency that has not been updated since 2020. Replacing it with platformdirs provides a modern, actively maintained alternative for retrieving platform-specific directory paths.\",\n  \"replacement\": \"platformdirs\",\n  \"migration_type\": \"swap\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"appdirs\",\n      \"line\": \"appdirs==1.4.4\"\n    },\n    {\n      \"action\": \"add\",\n      \"name\": \"platformdirs\",\n      \"line\": \"platformdirs\"\n    }\n  ],\n  \"file_edits\": [\n    {\n      \"path\": \"linkwatch/cache.py\",\n      \"new_content\": \"import json\\nimport os\\n\\nfrom platformdirs import user_cache_dir\\n\\nRESULTS_FILE = \\\"results.json\\\"\\n\\n\\ndef cache_dir():\\n    path = os.environ.get(\\\"LINKWATCH_CACHE_DIR\\\") or user_cache_dir(\\\"linkwatch\\\")\\n    os.makedirs(path, exist_ok=True)\\n    return path\\n\\n\\ndef cache_file():\\n    return os.path.join(cache_dir(), RESULTS_FILE)\\n\\n\\ndef save_results(results):\\n    path = cache_file()\\n    with open(path, \\\"w\\\", encoding=\\\"utf-8\\\") as fh:\\n        json.dump(results, fh, indent=2)\\n    return path\\n\\n\\ndef load_results():\\n    path = cache_file()\\n    if not os.path.exists(path):\\n        return []\\n    with open(path, encoding=\\\"utf-8\\\") as fh:\\n        return json.load(fh)\\n\"\n    },\n    {\n      \"path\": \"pyproject.toml\",\n      \"new_content\": \"[build-system]\\nrequires = [\\\"setuptools>=61\\\"]\\nbuild-backend = \\\"setuptools.build_meta\\\"\\n\\n[project]\\nname = \\\"linkwatch\\\"\\nversion = \\\"0.3.1\\\"\\ndescription = \\\"A small CLI link and uptime checker with an HTML status page\\\"\\nreadme = \\\"README.md\\\"\\nlicense = { text = \\\"MIT\\\" }\\nrequires-python = \\\">=3.10\\\"\\ndependencies = [\\n    \\\"toml==0.10.2\\\",\\n    \\\"platformdirs\\\",\\n    \\\"requests==2.31.0\\\",\\n    \\\"Jinja2==2.11.3\\\",\\n    \\\"pydantic>=2\\\",\\n    \\\"click>=7\\\",\\n    \\\"six\\\",\\n    \\\"chardet==5.2.0\\\",\\n    \\\"setuptools==75.8.0\\\",\\n    \\\"idna==2.7\\\",\\n    \\\"python-dateutil\\\",\\n    \\\"rich\\\",\\n]\\n\\n[project.scripts]\\nlinkwatch = \\\"linkwatch.cli:cli\\\"\\n\\n[tool.setuptools]\\npackages = [\\\"linkwatch\\\"]\\n\\n[tool.setuptools.package-data]\\nlinkwatch = [\\\"templates/*.j2\\\"]\\n\\n[tool.pytest.ini_options]\\ntestpaths = [\\\"tests\\\"]\\n\"\n    }\n  ],\n  \"steps\": [\n    \"Remove appdirs from requirements.txt and pyproject.toml\",\n    \"Add platformdirs to requirements.txt and pyproject.toml\",\n    \"Update the import in linkwatch/cache.py from appdirs to platformdirs\"\n  ],\n  \"suggested_tests\": [\n    \"Run the application and verify that the cache directory is created in the expected OS-specific location.\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+}

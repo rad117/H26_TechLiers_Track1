@@ -1,0 +1,27 @@
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -6,7 +6,6 @@
+ click>=7
+ six
+ chardet==5.2.0
+-setuptools==75.8.0
+ idna==2.7
+ python-dateutil
+ rich
+--- a/linkwatch/resources.py
++++ b/linkwatch/resources.py
+@@ -1,7 +1,7 @@
+-import pkg_resources
+-
+-TEMPLATE_NAME = "status.html.j2"
+-
+-
+-def template_dir():
+-    return pkg_resources.resource_filename("linkwatch", "templates")
++from importlib import resources
++
++TEMPLATE_NAME = "status.html.j2"
++
++
++def template_dir():
++    return str(resources.files("linkwatch") / "templates")

@@ -1,0 +1,27 @@
+{
+  "source": "gemma",
+  "model": "gemma-4-31b-it",
+  "ok": true,
+  "prompt_key": "53777131e749e2b4",
+  "risk_explanation": "The idna dependency is pinned to an extremely old version (2.7 from 2018) and is declared as unused in the project's source code.",
+  "replacement": "None",
+  "migration_type": "remove",
+  "requirement_changes": [
+    {
+      "action": "remove",
+      "name": "idna",
+      "line": ""
+    }
+  ],
+  "file_edits": [],
+  "steps": [
+    "Remove idna==2.7 from requirements.txt",
+    "Remove idna==2.7 from the dependencies list in pyproject.toml"
+  ],
+  "suggested_tests": [
+    "Run pytest to ensure no hidden dependencies on idna exist"
+  ],
+  "predicted_outcome": "pass",
+  "confidence": 1.0,
+  "raw": "{\n  \"risk_explanation\": \"The idna dependency is pinned to an extremely old version (2.7 from 2018) and is declared as unused in the project's source code.\",\n  \"replacement\": \"None\",\n  \"migration_type\": \"remove\",\n  \"requirement_changes\": [\n    {\n      \"action\": \"remove\",\n      \"name\": \"idna\"\n    }\n  ],\n  \"file_edits\": [\n    {\n      \"path\": \"pyproject.toml\",\n      \"new_content\": \"[build-system]\\nrequires = [\\\"setuptools>=61\\\"]\\nbuild-backend = \\\"setuptools.build_meta\\\"\\n\\n[project]\\nname = \\\"linkwatch\\\"\\nversion = \\\"0.3.1\\\"\\ndescription = \\\"A small CLI link and uptime checker with an HTML status page\\\"\\nreadme = \\\"README.md\\\"\\nlicense = { text = \\\"MIT\\\" }\\nrequires-python = \\\">=3.10\\\"\\ndependencies = [\\n    \\\"toml==0.10.2\\\",\\n    \\\"appdirs==1.4.4\\\",\\n    \\\"requests==2.31.0\\\",\\n    \\\"Jinja2==2.11.3\\\",\\n    \\\"pydantic>=2\\\",\\n    \\\"click>=7\\\",\\n    \\\"six\\\",\\n    \\\"chardet==5.2.0\\\",\\n    \\\"setuptools==75.8.0\\\",\\n    \\\"python-dateutil\\\",\\n    \\\"rich\\\",\\n]\\n\\n[project.scripts]\\nlinkwatch = \\\"linkwatch.cli:cli\\\"\\n\\n[tool.setuptools]\\npackages = [\\\"linkwatch\\\"]\\n\\n[tool.setuptools.package-data]\\nlinkwatch = [\\\"templates/*.j2\\\"]\\n\\n[tool.pytest.ini_options]\\ntestpaths = [\\\"tests\\\"]\"\n    }\n  ],\n  \"steps\": [\n    \"Remove idna==2.7 from requirements.txt\",\n    \"Remove idna==2.7 from the dependencies list in pyproject.toml\"\n  ],\n  \"suggested_tests\": [\n    \"Run pytest to ensure no hidden dependencies on idna exist\"\n  ],\n  \"predicted_outcome\": \"pass\",\n  \"confidence\": 1.0\n}"
+}

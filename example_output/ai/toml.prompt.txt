@@ -1,0 +1,183 @@
+You are helping a maintainer migrate away from a risky Python dependency.
+Below are VERIFIED FACTS about one dependency of the project (JSON), plus the full text of the
+project's dependency files and of every source file that uses it. Python 3.12 is used. The project's
+tests are run with `pip install -r requirements.txt pytest` followed by `pytest`.
+
+Reply with ONLY one JSON object (no markdown fences, no commentary) with exactly these keys:
+{
+  "risk_explanation": "2-4 sentences: why this dependency is risky, based on the facts",
+  "replacement": "what to use instead, e.g. 'Jinja2>=3.1' or 'platformdirs (stdlib alternative: ...)'",
+  "migration_type": "bump" | "swap" | "remove",
+  "requirement_changes": [{"action": "set" | "remove" | "add", "name": "<package>", "line": "<requirements.txt line>"}],
+  "file_edits": [{"path": "<repo-relative path>", "new_content": "<the COMPLETE new text of the file>"}],
+  "steps": ["human-readable migration step", "..."],
+  "suggested_tests": ["a test worth adding or running", "..."],
+  "predicted_outcome": "pass" | "fail",
+  "confidence": 0.0-1.0
+}
+
+Rules:
+- bump: only the version changes. Use requirement_changes, and leave file_edits empty unless the new
+  version needs code changes.
+- swap: a different library. Remove the old requirement, add the new one, and give file_edits with the
+  COMPLETE new content of every file that must change. Only edit files shown below.
+- remove: the dependency is unused or replaceable by the standard library. Remove the requirement and
+  edit files if needed.
+- "set" replaces the requirements.txt line of an existing package, "add" appends a line, "remove"
+  deletes the package's line. "line" is needed for set and add.
+- Keep the program's behaviour identical. Prefer the smallest change that works. Do not touch tests.
+- predicted_outcome: "pass" if, after your change, the dependencies install cleanly AND no test that passes
+  today starts failing. Tests that already fail today (see the facts) do not count against you.
+  "fail" if you expect the install to break or any currently passing test to break. Be honest.
+
+
+## Verified facts (JSON)
+{
+  "name": "toml",
+  "import_names": [
+    "toml"
+  ],
+  "status": "declared",
+  "specs": {
+    "requirements.txt": "==0.10.2",
+    "pyproject.toml": "==0.10.2"
+  },
+  "pinned_version": "0.10.2",
+  "spec_mismatch": false,
+  "usages": [
+    {
+      "file": "linkwatch/config.py",
+      "line": 3,
+      "code": "import toml",
+      "names": [],
+      "private": false,
+      "is_test": false
+    }
+  ],
+  "pypi": {
+    "latest": "0.10.2",
+    "latest_date": "2020-11-01",
+    "pinned_date": "2020-11-01",
+    "inactive": true,
+    "requires_python": ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
+  },
+  "signals": [
+    {
+      "id": "old_pin",
+      "detail": "0.10.2 released 2020-11-01 (5 years ago)",
+      "points": -20,
+      "source": "pypi"
+    },
+    {
+      "id": "inactive",
+      "detail": "last release 2020-11-01, or marked Inactive",
+      "points": -20,
+      "source": "pypi"
+    }
+  ],
+  "health_score": 60,
+  "at_risk": true
+}
+
+## requirements.txt
+```
+toml==0.10.2
+appdirs==1.4.4
+requests==2.31.0
+Jinja2==2.11.3
+pydantic==1.10.13
+click>=7
+six
+chardet==5.2.0
+setuptools==75.8.0
+idna==2.7
+python-dateutil
+rich
+# PyYAML==5.1
+
+```
+
+## pyproject.toml
+```
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "linkwatch"
+version = "0.3.1"
+description = "A small CLI link and uptime checker with an HTML status page"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "toml==0.10.2",
+    "appdirs==1.4.4",
+    "requests==2.31.0",
+    "Jinja2==2.11.3",
+    "pydantic>=2",
+    "click>=7",
+    "six",
+    "chardet==5.2.0",
+    "setuptools==75.8.0",
+    "idna==2.7",
+    "python-dateutil",
+    "rich",
+]
+
+[project.scripts]
+linkwatch = "linkwatch.cli:cli"
+
+[tool.setuptools]
+packages = ["linkwatch"]
+
+[tool.setuptools.package-data]
+linkwatch = ["templates/*.j2"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+```
+
+## linkwatch/config.py
+```python
+from typing import List
+
+import toml
+from pydantic import BaseModel, validator
+
+
+class Site(BaseModel):
+    name: str
+    url: str
+
+    class Config:
+        anystr_strip_whitespace = True
+
+    @validator("name")
+    def name_not_empty(cls, value):
+        if not value:
+            raise ValueError("site name can not be empty")
+        return value
+
+    @validator("url")
+    def url_has_scheme(cls, value):
+        if not value.startswith(("http://", "https://")):
+            raise ValueError("url must start with http:// or https://")
+        return value
+
+
+class Settings(BaseModel):
+    title: str = "linkwatch"
+    output: str = "status.html"
+    sites: List[Site] = []
+
+    class Config:
+        extra = "forbid"
+
+
+def load_settings(path="sites.toml"):
+    data = toml.load(path)
+    return Settings(**data)
+
+```
