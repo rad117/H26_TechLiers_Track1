@@ -7,3 +7,10 @@ dist/
 .venv/
 venv/
 status.html
+
+# depexit
+capsule_out/
+capsule_dev/
+work/
+.env
+junit.xml
