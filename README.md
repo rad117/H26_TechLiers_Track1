@@ -122,8 +122,29 @@ capsule_out/
 - **What each fix did to the tests:** every test that failed in any run × every run; cells that changed are highlighted
 - **Every dependency, riskiest first:** click any row for the full evidence, Gemma's plan, the patch and the open concerns
 
-A real run against LinkWatch is committed in **[`example_output/`](example_output/)**.
-<!-- TODO(Radhesh): commit the real run (without _work/, but WITH _work/logs/) as example_output/ -->
+### Real result on LinkWatch
+
+A real run against LinkWatch (commit `f52f393`, Python 3.12.13, 4.6 minutes) is committed in
+**[`example_output/`](example_output/)**. Open [`example_output/report.html`](example_output/report.html) in a browser.
+
+**Gemma was right about 7 of 7 migrations.** Every fix installed and broke nothing that passed before:
+
+| Dependency | Health | Gemma's plan | Verified result |
+|---|---|---|---|
+| Jinja2 | 25 | bump to 3.1.6 | **improved:** fixed the broken report test (9/10 → 10/10 pass) |
+| setuptools | 60 | drop `pkg_resources`, use `importlib.resources` (stdlib) | **improved:** the deprecation warning is gone |
+| pydantic | 40 | port `config.py` to v2 (`field_validator`, `ConfigDict`) | same: nothing broke |
+| appdirs | 60 | swap to `platformdirs` | same: nothing broke |
+| chardet | 55 | swap to `charset-normalizer` | same: nothing broke |
+| toml | 60 | remove, use `tomllib` (stdlib) | same: nothing broke |
+| idna | 45 | remove (never imported directly) | same: nothing broke |
+
+"Same" still has 9/10 tests passing: the one failure is the pre-existing Jinja2 bug, which only the Jinja2 fix
+addresses. A perfect score is only as strong as the tests behind it: LinkWatch has 10 tests, so each capsule's
+"open concerns" section says that passing tests only prove the code paths they cover.
+
+The evidence is reproducible: `example_output/replay.ps1` re-runs every test, and the sha256 fingerprints in
+`summary.json` match the committed files byte for byte (`.gitattributes` stops git rewriting their line endings).
 
 ---
 
@@ -219,7 +240,7 @@ The report is one self-contained HTML file with no external scripts, fonts or CD
 | | |
 |---|---|
 | **Model** | Gemma 4, instruction-tuned |
-| **Version (model id)** | `gemma-4-31b-it` (set via `GEMMA_MODEL`), with automatic fallback to `gemma-4-26b-a4b-it` (`GEMMA_FALLBACK_MODEL`) when the first returns server errors. The model that actually answered is recorded in every result and shown in the report. <!-- TODO(Sohan): confirm the ids used in the example_output run --> |
+| **Version (model id)** | `gemma-4-31b-it` (set via `GEMMA_MODEL`), with automatic fallback to `gemma-4-26b-a4b-it` (`GEMMA_FALLBACK_MODEL`) when the first returns server errors. The model that actually answered is recorded in every result and shown in the report. In the `example_output` run, `gemma-4-31b-it` answered for 2 dependencies and the fallback `gemma-4-26b-a4b-it` for 5. |
 | **Source** | Google DeepMind |
 | **Access method** | Gemini API, through the official `google-genai` Python SDK |
 | **Licence / terms** | <!-- TODO(Leena): exact licence name + link from the Gemma 4 model page (docs/model.md) --> See the Gemma terms at [ai.google.dev/gemma](https://ai.google.dev/gemma) |
@@ -247,6 +268,10 @@ held up.
   a second model and record any failure as "not tested" rather than guess.
 - **Scores are heuristics.** The signal weights are our judgement, documented above, not a standard.
 - **Windows-first.** The replay script is PowerShell, and the tool has been run on Windows 11 with Python 3.12.
+  Patches carry the line endings of the machine that made them; `replay.ps1` uses `git apply --ignore-whitespace`,
+  which we tested to work with git's `core.autocrlf` both on and off.
+- **Small test suites make for easy grading.** On LinkWatch (10 tests) Gemma scored 7/7; a project with deeper tests
+  would test its predictions harder.
 - **The target must already have a test suite**; without tests there is nothing to verify against.
 <!-- TODO(Sohan/Sheersh): add anything else you hit during the real run -->
 

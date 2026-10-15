@@ -2,8 +2,11 @@
 
 **For Leena** (and anyone presenting). Written by Radhesh, 15 Oct. Plain language, no code needed.
 
-> **Numbers rule:** anything in **[brackets]** gets filled in from the **real run** (after 2:15). Never use the
-> numbers from `team/sample_data`: that data is invented, and the judges may ask.
+> **Numbers rule:** every number below now comes from the **real run** in `example_output/` (15 Oct, 15:36).
+> Never use the numbers from `team/sample_data`: that data is invented, and the judges may ask.
+>
+> **Real result:** Gemma was right about **7 of 7** migrations. Jinja2's fix repaired the broken test (9/10 → 10/10);
+> setuptools' fix removed the deprecation warning; the other 5 broke nothing. The run took 4.6 minutes.
 
 ---
 
@@ -38,12 +41,11 @@ Asking an AI helps, but AI answers can be confidently wrong.
 ### What you get at the end (the deliverables)
 | File | What it is |
 |---|---|
-| `report.html` | **The Blast Radius page.** Opens in any browser, works offline. The headline: **"Gemma was right about [X] of [Y] migrations."** |
+| `report.html` | **The Blast Radius page.** Opens in any browser, works offline. The headline: **"Gemma was right about 7 of 7 migrations."** (real run) |
 | `<dependency>/capsule.md` | A readable report per risky dependency: verified facts first, Gemma's suggestions second, honest concerns last |
 | `<dependency>/patch.diff` | The exact code change that was tested |
 | `replay.ps1` | Re-runs every test from scratch, so anyone can check our evidence |
 | `summary.json` | All the data, with a fingerprint (sha256) of every evidence file, so nobody can quietly edit it later |
-| `badge.svg` | A small "dependency health" badge a project can put on its GitHub page |
 
 ### What makes it different (our wow factor)
 **Most AI tools trust the AI. We grade it.**
@@ -96,7 +98,7 @@ Under it: *One command:* `python -m depexit analyze <github-url>`
 ### Slide 3: Tech and the AI model (Radhesh)
 **On the slide:**
 - **AI model:** Gemma 4 (`gemma-4-31b-it`, with `gemma-4-26b-a4b-it` as fallback) by Google DeepMind, via the
-  Gemini API. *(Sohan: confirm the exact id used in the real run.)*
+  Gemini API. In the real run, the 31B model answered 2 dependencies and the fallback answered 5.
 - **What Gemma does:** explains the risk, proposes the replacement and code edits, predicts "safe or breaks?" with
   a confidence.
 - **What Gemma is NOT trusted for:** every suggestion is tested before we report it as working.
@@ -108,7 +110,7 @@ apply its change in a sandbox copy and run the real tests."
 
 ### Slide 4: Feasibility, limits and risks (Leena)
 **On the slide:**
-- ✅ **Works today** on a real repository, end to end, in about [N] minutes
+- ✅ **Works today** on a real repository, end to end: 7 migrations tested in 4.6 minutes
 - ✅ **Fast and free:** `uv` installs in about 10–20 s per test run; no paid APIs
 - ⚠ **Limits (honest):**
   - Tests only prove what they cover: a fix can pass the tests and still break untested code
@@ -125,8 +127,9 @@ from the evidence."
 - **Who benefits:** every Python maintainer with old version pins
 - **Before:** hours of trial and error per library, AI answers taken on faith
 - **After:** one command → a tested plan, the exact patch, and evidence anyone can re-run
-- **Result on LinkWatch:** [X of Y] Gemma migrations held up; [the fixed test, e.g. "Jinja2 upgrade fixed the broken
-  report test"]; [where Gemma was wrong]
+- **Result on LinkWatch:** all 7 Gemma migrations held up. The Jinja2 upgrade fixed the broken report test
+  (9/10 → 10/10), and the setuptools fix removed a deprecation warning. Gemma even caught that pydantic v2 renamed a
+  setting (`anystr_strip_whitespace` → `str_strip_whitespace`)
 
 **Say:** "The output isn't a chat answer; it's a capsule a maintainer can keep, check and replay."
 
@@ -143,8 +146,9 @@ note whether Gemma agreed):
 | toml | Python 3.11+ has `tomllib` built in | docs.python.org/3/library/tomllib.html |
 | Gemma 4 | Model card and licence/terms | ai.google.dev/gemma *(put the exact terms link in `docs/model.md`)* |
 
-**Say:** "Where Gemma disagreed with the official source, the test results showed it." *(Use this only if it's
-true in the real run.)*
+**Say:** "Gemma's replacements matched the official migration path every time: Jinja2 3.x, pydantic v2,
+`platformdirs`, `tomllib`, and `importlib.resources` instead of `pkg_resources`. The tests then confirmed none of
+them broke anything." *(Leena: confirm each link before saying this.)*
 
 ### Optional last slide: demo / thank you
 Repo link: **github.com/rad117/H26_TechLiers_Track1**, plus a QR code if the template has room.
@@ -154,9 +158,11 @@ Repo link: **github.com/rad117/H26_TechLiers_Track1**, plus a QR code if the tem
 ## Part 3: Demo script (2 minutes)
 1. **Problem (15 s):** "LinkWatch fails its own tests today because of stale dependencies."
 2. **Run (20 s):** run the command, or show the recording if the venue Wi-Fi is bad.
-3. **Open `report.html` (20 s):** read the headline aloud: "Gemma was right about [X] of [Y]."
+3. **Open `example_output/report.html` (20 s):** read the headline aloud: "Gemma was right about 7 of 7."
 4. **Click Jinja2 (20 s):** the solid green box says the tests went from 9/10 to 10/10, with the patch shown.
-5. **Point at the wrong one (20 s):** "Here Gemma was [70]% sure, and it broke [1] test. We show that."
+5. **Click pydantic (20 s):** "Gemma ported the config file to pydantic v2 and even caught a renamed setting, and the
+   tests confirm nothing broke. But we don't stop at a perfect score: LinkWatch only has 10 tests, so every capsule
+   says what the tests *don't* prove."
 6. **Test grid (10 s):** "Each column is a real test run; bright cells are what each fix changed."
 7. **Capsule and replay (15 s):** "Anyone can run `replay.ps1` and get the same evidence."
 
@@ -166,6 +172,7 @@ Repo link: **github.com/rad117/H26_TechLiers_Track1**, plus a QR code if the tem
 | Which parts are AI and which are verified? | Only step 3 is AI. On the report, dashed = AI claim, solid = tested. Every capsule has separate ✅ and 🤖 sections. |
 | How do you know Gemma's fix works? | We apply it to a copy, install fresh with Python 3.12, and run the project's own tests, before and after. |
 | What if Gemma is wrong? | We show it: the scorecard counts it, and the capsule explains which test broke and why. |
+| 7 out of 7: isn't that suspicious? | It's what the tests showed, and replay.ps1 lets you check. But LinkWatch only has 10 tests, so a perfect score is only as strong as they are; every capsule's "open concerns" says so. On a project with deeper tests, the grading is harder. |
 | Is "pass" fair to Gemma? | Yes: "safe" means it breaks nothing that worked before. Pre-existing failures don't count against it. |
 | Could you have faked the results? | Every evidence file has a sha256 fingerprint in `summary.json`, and `replay.ps1` re-runs everything. |
 | What are the limits? | Tests only cover what they test; Python only; pyproject.toml isn't auto-edited yet. (See slide 4.) |
