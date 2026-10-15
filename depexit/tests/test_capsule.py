@@ -31,6 +31,13 @@ def test_markdown_separates_verified_from_ai(tmp_path):
     assert "SAMPLE DATA" in md                    # sample runs are always labelled
 
 
+def test_wrong_prediction_is_explained_in_safe_broke_terms(tmp_path):
+    # Team decision A: "pass" = installs and no test that passed before fails after
+    write_sample(tmp_path)
+    md = (tmp_path / "pydantic" / "capsule.md").read_text(encoding="utf-8")
+    assert "Gemma predicted the change was safe, but it broke 1 test(s) that passed before." in md
+
+
 def test_failed_ai_is_reported_not_crashed(tmp_path):
     write_sample(tmp_path)
     md = (tmp_path / "appdirs" / "capsule.md").read_text(encoding="utf-8")

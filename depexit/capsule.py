@@ -14,6 +14,10 @@ import sys
 from pathlib import Path
 
 REPORT_TEMPLATE = Path(__file__).parent / "templates" / "report.html"
+# Team decision A (15 Oct): a migration "passes" if it installs and no test that passed before fails after.
+# Tests that already failed on the original dependencies don't count against it.
+SAFE = {"pass": "safe", "fail": "breaks something"}
+SAFE_MEANING = '"Safe" means the change installs and no test that passed before fails after it.'
 SAMPLE_BANNER ="> ⚠ **SAMPLE DATA, NOT A REAL RUN.** Every AI field and candidate test run in this file is invented.\n\n"
 
 
@@ -81,13 +85,14 @@ def capsule_md(meta, dep, result, baseline):
     verdict = cmp["verdict"] if cmp else "not run"
     if cmp and cmp.get("prediction_correct") is not None:
         mark = "✅" if cmp["prediction_correct"] else "❌"
-        prediction = f"Gemma prediction: {cmp['predicted_outcome']} → actual: {cmp['actual_outcome']} {mark}"
+        prediction = f"Gemma predicted: {SAFE[cmp['predicted_outcome']]} → actual: {SAFE[cmp['actual_outcome']]} {mark}"
     else:
         prediction = "Gemma prediction: not graded"
 
     md = [f"# Dependency Exit Capsule: {dep['name']}\n",
           SAMPLE_BANNER if meta.get("sample") else "",
           f"Health score: {dep.get('health_score', '?')}/100 · Verdict: {verdict} · {prediction}\n",
+          f"_{SAFE_MEANING}_\n",
           f"Target: {meta.get('target')} @ `{meta.get('target_commit') or 'unknown commit'}`\n",
           "## ✅ Verified (observed by depexit)\n",
           "### Dependency details\n"]
@@ -148,7 +153,7 @@ def capsule_md(meta, dep, result, baseline):
                f"- `{ai.get('replacement')}` ({ai.get('migration_type')})",
                *[f"- requirements.txt: {c['action']} `{c.get('line') or c['name']}`" for c in ai.get("requirement_changes") or []],
                *[f"- rewrites `{e['path']}`" for e in ai.get("file_edits") or []],
-               f"- Predicted outcome: **{ai.get('predicted_outcome')}** (confidence {ai.get('confidence')})", "",
+               f"- Predicted: **{SAFE.get(ai.get('predicted_outcome'), '?')}** (confidence {ai.get('confidence')})", "",
                "### Migration steps\n",
                *[f"{i}. {s}" for i, s in enumerate(ai.get("steps") or [], 1)], "",
                "### Suggested tests\n",
@@ -171,7 +176,13 @@ def concerns(dep, ai, run, cmp):
     if run and run["stage"] != "tests":
         out.append(f"Install was blocked at stage `{run['stage']}`; the tests never ran.")
     if cmp and cmp.get("prediction_correct") is False:
-        out.append(f"Gemma predicted `{cmp['predicted_outcome']}` but the tests showed `{cmp['actual_outcome']}`.")
+        if cmp["predicted_outcome"] == "fail":
+            out.append("Gemma predicted the change would break something, but no test that passed before failed.")
+        elif run and run["stage"] != "tests":
+            out.append("Gemma predicted the change was safe, but it could not even be installed.")
+        else:
+            out.append(f"Gemma predicted the change was safe, but it broke {len(cmp.get('newly_failing') or [])} "
+                       "test(s) that passed before.")
     if cmp and cmp.get("still_failing"):
         out.append(f"{len(cmp['still_failing'])} test(s) still fail after this change (may be unrelated to it).")
     changed = {c["name"].lower() for c in (ai or {}).get("requirement_changes") or []}

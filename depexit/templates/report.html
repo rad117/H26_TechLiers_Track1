@@ -141,6 +141,7 @@
   <div class="key">
     <span><i class="swatch claim"></i>Dashed: what Gemma claimed</span>
     <span><i class="swatch fact"></i>Solid: what the tests showed</span>
+    <span>Safe: the fix installs, and no test that passed before fails after it</span>
   </div>
   <ul class="ledger" id="ledger"></ul>
 
@@ -179,6 +180,8 @@ function el(tag, props, ...kids) {
   return node;
 }
 const $ = (id) => document.getElementById(id);
+// Team decision A: "pass" = installs and breaks no test that passed before (pre-existing failures don't count)
+const SAFE = {pass: "safe", fail: "breaks"};
 const healthClass = (s) => (s < 50 ? "bad" : s < 70 ? "warn" : "good");
 const resultFor = Object.fromEntries((DATA.results || []).map((r) => [r.dep.name, r]));
 const recordFor = Object.fromEntries((DATA.records || []).map((r) => [r.name, r]));
@@ -189,7 +192,10 @@ $("sample").hidden = !meta.sample;
 const commit = meta.target_commit ? meta.target_commit.slice(0, 7) : "unknown commit";
 $("target").append(el("a", {href: meta.target || "#"}, (meta.target || "").replace("https://github.com/", "")), " @ " + commit);
 $("when").textContent = `${(meta.generated_at || "").replace("T", " ").slice(0, 16)} UTC, ${meta.duration_s ?? "?"} s`;
-$("model").textContent = meta.model ? `Gemma model: ${meta.model}` : "Gemma not run";
+// gemma.py can fall back to a second model, so name the models that actually answered
+const usedModels = [...new Set((DATA.results || []).filter((r) => r.ai?.ok && r.ai.model).map((r) => r.ai.model))];
+$("model").textContent = usedModels.length ? `Answered by ${usedModels.join(", ")}`
+  : meta.model ? `Gemma model: ${meta.model}` : "Gemma not run";
 
 $("headline").textContent = card.total
   ? `Gemma was right about ${card.correct} of ${card.total} migration${card.total === 1 ? "" : "s"}.`
@@ -197,14 +203,14 @@ $("headline").textContent = card.total
 $("lede").textContent = (base
   ? `Before changing anything, ${base.passed} of ${base.tests} tests pass on the original dependencies. `
   : "The baseline tests were not run. ")
-  + "For each risky dependency, Gemma proposed a fix and predicted the test outcome; depexit then applied the fix in a copy of the repo and ran the real test suite.";
+  + "For each risky dependency, Gemma proposed a fix and predicted whether it would break anything; depexit then applied the fix in a copy of the repo and ran the real test suite.";
 
 // ---------- Gemma vs Reality ledger ----------
 const why = Object.fromEntries((card.wrong || []).map((w) => [w.dep, w.why]));
 for (const r of DATA.results || []) {
   const ai = r.ai, run = r.run, cmp = r.comparison, name = r.dep.name;
   const predicted = ai && ai.ok
-    ? el("span", {class: "claim"}, el("span", {class: "pill ai"}, ai.predicted_outcome),
+    ? el("span", {class: "claim"}, el("span", {class: "pill ai"}, SAFE[ai.predicted_outcome] || ai.predicted_outcome),
         el("span", {class: "conf", title: "Gemma's own confidence"}, el("i", {style: `width:${Math.round((ai.confidence || 0) * 100)}%`})),
         el("span", {class: "conf-label"}, `${Math.round((ai.confidence || 0) * 100)}% sure`))
     : el("span", {class: "claim"}, el("span", {class: "pill none"}, "none"), el("span", {class: "muted"}, ai ? "no usable answer" : "not asked"));
@@ -213,7 +219,10 @@ for (const r of DATA.results || []) {
   else if (run.stage !== "tests") observed = el("span", {class: "observed"}, el("span", {class: "pill fact fail"}, "blocked"), `at ${run.stage}`);
   else {
     const outcome = cmp ? cmp.actual_outcome : run.ok ? "pass" : "fail";   // the comparison is the graded truth
-    observed = el("span", {class: "observed"}, el("span", {class: `pill fact ${outcome}`}, outcome), `${run.passed}/${run.tests} tests`);
+    const broke = cmp?.newly_failing?.length || 0, fixed = cmp?.newly_passing?.length || 0;
+    observed = el("span", {class: "observed"},
+      el("span", {class: `pill fact ${outcome}`}, outcome === "pass" ? "safe" : broke ? `broke ${broke}` : "breaks"),
+      fixed ? `fixed ${fixed}, ` : "", `${run.passed}/${run.tests} pass`);
   }
   const correct = cmp ? cmp.prediction_correct : null;
   const grade = correct === true ? el("span", {class: "grade right"}, "Held up")
@@ -329,12 +338,12 @@ function openPanel(name) {
       cmp && cmp.gaps.length ? [el("h5", {}, "Compatibility gaps"), list(cmp.gaps)] : null),
 
     el("section", {class: "box ai"},
-      el("h4", {}, `🤖 What Gemma suggested`),
+      el("h4", {}, "🤖 What Gemma suggested", ai?.model ? el("span", {class: "muted"}, ` (${ai.model})`) : null),
       !ai ? el("p", {class: "muted"}, rec.at_risk ? "Gemma was not asked about this dependency." : "Not at risk, so Gemma was not asked.")
       : !ai.ok ? el("p", {}, `Gemma failed: ${ai.error || "unknown error"}`)
       : [el("p", {}, ai.risk_explanation),
-         el("p", {}, "Replace with ", el("code", {}, ai.replacement), ` (${ai.migration_type}). Predicted tests: `,
-           el("strong", {}, ai.predicted_outcome), `, ${Math.round((ai.confidence || 0) * 100)}% sure.`),
+         el("p", {}, "Replace with ", el("code", {}, ai.replacement), ` (${ai.migration_type}). Predicted: `,
+           el("strong", {}, SAFE[ai.predicted_outcome] || ai.predicted_outcome), `, ${Math.round((ai.confidence || 0) * 100)}% sure.`),
          el("h5", {}, "Steps"), list(ai.steps, "ol"),
          (ai.suggested_tests || []).length ? [el("h5", {}, "Tests it would add"), list(ai.suggested_tests)] : null]),
 
