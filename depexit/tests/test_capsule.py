@@ -16,7 +16,9 @@ def write_sample(out):
 def test_writes_every_capsule_file(tmp_path):
     write_sample(tmp_path)
     assert (tmp_path / "summary.json").exists()
-    assert (tmp_path / "replay.ps1").exists()
+    replay = (tmp_path / "replay.ps1").read_text(encoding="utf-8-sig")
+    # patches carry \r\n context from a Windows clone; without this flag they fail on autocrlf=false machines
+    assert "apply --ignore-whitespace" in replay
     for dep in ["Jinja2", "pydantic", "appdirs"]:
         for name in ["capsule.json", "capsule.md", "patch.diff"]:
             assert (tmp_path / dep / name).exists(), f"{dep}/{name} missing"

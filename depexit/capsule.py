@@ -227,7 +227,9 @@ def write_replay(out, meta, results, baseline):
         lines.extend([f"# ----- {title} -----", f"$dir = Join-Path $root '{folder}'",
                       f"git clone -q {target} $dir", checkout])
         if patch:
-            lines.append(f"git -C $dir apply (Join-Path $capsule '{patch}')")
+            # --ignore-whitespace: the patch's context lines may end in \r\n or \n depending on the
+            # machine's git autocrlf setting; tested to apply both ways
+            lines.append(f"git -C $dir apply --ignore-whitespace (Join-Path $capsule '{patch}')")
         lines.append("Push-Location $dir")
         lines.extend(ps_command(c) for c in commands)
         lines.extend(["Pop-Location", ""])
