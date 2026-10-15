@@ -3,6 +3,7 @@
 Owner: Sheersh. Output shapes: TestRun in team/CONTRACT.md. Everything this module reports
 is VERIFIED evidence, so record every command it runs.
 """
+import difflib
 import os
 import re
 import shutil
@@ -143,7 +144,95 @@ def run_tests(repo_dir, label, work):
     return finish()
 
 
+REQ_NAME_RE = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9._-]*)")
+
+
+def normalise(name):
+    """PyPI treats Jinja2, jinja2 and jinja_2 style names as the same package."""
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def req_name(line):
+    """Package name of a requirements.txt line, or None for comments, blanks and pip options."""
+    match = REQ_NAME_RE.match(line)
+    return normalise(match.group(1)) if match else None
+
+
+def read_text(path):
+    """File text with its line endings untouched, or None if the file doesn't exist."""
+    return path.read_bytes().decode("utf-8") if path.exists() else None
+
+
+def write_text(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8", newline="") as fh:  # newline="": don't add \r on Windows
+        fh.write(text)
+
+
+def change_requirements(text, changes, notes):
+    """Apply Gemma's set/remove/add changes to requirements.txt text."""
+    lines = text.splitlines(keepends=True)
+    for change in changes:
+        action, name = change.get("action"), normalise(str(change.get("name", "")))
+        line = str(change.get("line") or "").strip()
+        if action == "remove":
+            lines = [l for l in lines if req_name(l) != name]
+        elif action in ("set", "add"):
+            # AI output: only accept a plain package line for the package it names,
+            # never pip options like "--index-url ..." or a second package smuggled in
+            if req_name(line) != name or "\n" in line:
+                notes.append(f"rejected requirement change {change!r}")
+                continue
+            if any(req_name(l) == name for l in lines):
+                lines = [line + "\n" if req_name(l) == name else l for l in lines]
+            else:
+                if lines and not lines[-1].endswith("\n"):
+                    lines[-1] += "\n"
+                lines.append(line + "\n")
+        else:
+            notes.append(f"unknown requirement action {change!r}")
+    return "".join(lines)
+
+
+def file_diff(path, old, new):
+    """Unified diff of one file in the a/ b/ form that `git apply` accepts."""
+    old_lines = old.splitlines(keepends=True) if old is not None else []
+    new_lines = new.splitlines(keepends=True)
+    for lines in (old_lines, new_lines):
+        if lines and not lines[-1].endswith("\n"):
+            lines[-1] += "\n\\ No newline at end of file\n"
+    return list(difflib.unified_diff(old_lines, new_lines,
+                                     "/dev/null" if old is None else f"a/{path}", f"b/{path}"))
+
+
 def apply_migration(repo, record, ai, work):
     """Copy repo to work/candidates/<name>, apply ai['requirement_changes'] and ai['file_edits'].
     Return (candidate_path, unified_diff_text)."""
-    raise NotImplementedError("Sheersh: see team/SHEERSH.md, task 2")
+    repo = Path(repo).resolve()
+    cand = Path(work).resolve() / "candidates" / re.sub(r"[^A-Za-z0-9._-]", "_", record["name"])
+    if cand.exists():
+        shutil.rmtree(cand)  # start clean on every run
+    shutil.copytree(repo, cand, ignore=shutil.ignore_patterns(".git", ".venv", "__pycache__", "junit.xml"))
+    cand = cand.resolve()
+    notes, changed = [], {}  # changed: "relative/path" -> new file text
+
+    if ai.get("requirement_changes"):
+        old = read_text(cand / "requirements.txt") or ""
+        changed["requirements.txt"] = change_requirements(old, ai["requirement_changes"], notes)
+
+    for edit in ai.get("file_edits") or []:
+        path, content = str(edit.get("path", "")), edit.get("new_content")
+        target = (cand / path).resolve()
+        # AI output: refuse anything that would write outside the candidate copy (../, /etc/...)
+        if not target.is_relative_to(cand) or target == cand or not isinstance(content, str):
+            notes.append(f"rejected file edit {path!r}")
+            continue
+        changed[target.relative_to(cand).as_posix()] = content
+
+    diff = [f"# depexit: {note}\n" for note in notes]  # git apply ignores text before the first diff
+    for path, new in changed.items():
+        old = read_text(repo / path)
+        if new != old:
+            write_text(cand / path, new)
+            diff += file_diff(path, old, new)
+    return cand, "".join(diff)
