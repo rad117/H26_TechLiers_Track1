@@ -26,7 +26,7 @@ def venv_python(repo_dir):
 
 def relative(text, repo_dir):
     """Strip the absolute repo path so baseline and candidate output can be compared."""
-    return text.replace(str(repo_dir) + os.sep, "")
+    return text.replace(str(repo_dir) + os.sep, "").replace(str(repo_dir) + "/", "")
 
 
 def tail(text, lines=40):

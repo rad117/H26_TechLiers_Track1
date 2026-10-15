@@ -61,7 +61,7 @@ def test_apply_migration_set_remove_add_and_diff_applies_with_git(tmp_path):
     assert (cand / "requirements.txt").read_text() == "Jinja2>=3.1,<4\n# PyYAML==5.1\nplatformdirs>=4\n"
     assert (repo / "requirements.txt").read_text().startswith("toml==")  # the original is untouched
     # the patch must recreate the candidate from the original (replay.ps1 runs `git apply`)
-    (tmp_path / "patch.diff").write_text(diff, encoding="utf-8")
+    (tmp_path / "patch.diff").write_bytes(diff.encode("utf-8"))  # write_text would turn \r\n into \r\r\n on Windows
     subprocess.run(["git", "apply", str(tmp_path / "patch.diff")], cwd=repo, check=True)
     assert (repo / "requirements.txt").read_text() == (cand / "requirements.txt").read_text()
     assert (repo / "linkwatch" / "resources.py").read_text() == "import importlib.resources\n"
