@@ -210,6 +210,23 @@ Every claim in the "verified" sections comes from a command we ran and logged:
 - **Anyone can re-check.** Every command is recorded and written to `replay.ps1`, every log is kept, and
   `summary.json` stores a sha256 fingerprint of each evidence file.
 
+### Control experiment: can the grader say no?
+A perfect score only means something if the grader can also fail a migration. [`depexit/control.py`](depexit/control.py)
+feeds the same runner and grader a **human-written, deliberately wrong** migration: swap the abandoned `toml` for the
+standard library's `tomllib`, but open the file in text mode (tomllib needs binary mode). It installs fine and looks
+plausible; it "predicts" *safe* with 90% confidence.
+
+```text
+$ python -m depexit.control https://github.com/rishrek/LinkWatch --out control_output
+verdict=regressed  predicted=pass  actual=fail
+  gap: tests/test_config.py::test_sites_file_loads now fails: TypeError: File must be opened in binary mode, e.g. use `open('foo.toml', 'rb')`
+CAUGHT: the grader rejected the wrong migration
+```
+
+Exactly one test newly fails, with the exact error, and the prediction is graded wrong. The evidence (patch, logs,
+full comparison) is in [`control_output/`](control_output/). So Gemma's 7/7 is a result the grader could have
+rejected, not a grader that accepts everything.
+
 ---
 
 ## 5. Dependencies

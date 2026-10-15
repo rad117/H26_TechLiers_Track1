@@ -172,7 +172,7 @@ Repo link: **github.com/rad117/H26_TechLiers_Track1**, plus a QR code if the tem
 | Which parts are AI and which are verified? | Only step 3 is AI. On the report, dashed = AI claim, solid = tested. Every capsule has separate ✅ and 🤖 sections. |
 | How do you know Gemma's fix works? | We apply it to a copy, install fresh with Python 3.12, and run the project's own tests, before and after. |
 | What if Gemma is wrong? | We show it: the scorecard counts it, and the capsule explains which test broke and why. |
-| 7 out of 7: isn't that suspicious? | It's what the tests showed, and replay.ps1 lets you check. But LinkWatch only has 10 tests, so a perfect score is only as strong as they are; every capsule's "open concerns" says so. On a project with deeper tests, the grading is harder. |
+| 7 out of 7: isn't that suspicious? | We tested the tester. `python -m depexit.control` feeds the same grader a deliberately wrong migration (tomllib opened in text mode). It installs fine, claims 90% confidence, and the grader catches it: 1 test newly fails with the exact TypeError, verdict "regressed", prediction graded wrong. So 7/7 is a score the grader could have rejected. Honest caveat: LinkWatch only has 10 tests, and every capsule's "open concerns" says so. |
 | Is "pass" fair to Gemma? | Yes: "safe" means it breaks nothing that worked before. Pre-existing failures don't count against it. |
 | Could you have faked the results? | Every evidence file has a sha256 fingerprint in `summary.json`, and `replay.ps1` re-runs everything. |
 | What are the limits? | Tests only cover what they test; Python only; pyproject.toml isn't auto-edited yet. (See slide 4.) |
